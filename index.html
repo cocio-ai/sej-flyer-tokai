@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>セブン仕込み表 Mobile 最終・コピー機能追加版</title>
+    <title>セブン仕込み表 Mobile 東海版 (全パターン一括印刷)</title>
     <style>
         :root {
             --711-green: #008060;
@@ -116,7 +116,7 @@
         
         .action-btns { display: flex; gap: 6px; }
         .btn-sub { flex: 1; background: #444; color: #fff; border-radius: 6px; border: none; font-size: 13px; padding: 12px 2px;}
-        .btn-main { flex: 1.5; background: var(--711-orange); color: #fff; font-size: 14px; padding: 12px 2px; border-radius: 6px; border: none; font-weight: bold; }
+        .btn-main { flex: 1.5; background: var(--711-orange); color: #fff; font-size: 14px; padding: 12px 2px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
 
         #master-modal, #copy-modal {
             display: none; position: fixed; inset: 0;
@@ -124,22 +124,30 @@
         }
         textarea { width: 100%; height: 50vh; margin: 10px 0; padding: 10px; border: 1px solid #ccc; font-size: 13px; }
 
-        /* A4縦印刷用スタイル（1枚ピタリ収め） */
+        /* =========================================
+           一括印刷専用スタイル（A4縦に6パターン配置）
+           ========================================= */
+        #print-container { display: none; }
+        
         @media print {
             @page { size: A4 portrait; margin: 5mm; }
             body { padding: 0; margin: 0; background: white; -webkit-print-color-adjust: exact; }
-            .bottom-nav, .header, .expand-btn, .hide-label { display: none !important; }
-            #app-container { height: 280mm; display: flex; flex-direction: column; gap: 4mm; }
-            .shelf { box-shadow: none; border: 2px solid #000; border-radius: 0; margin: 0; flex: 1; display: flex; flex-direction: column; }
-            .shelf.hidden { display: none !important; }
-            .shelf-header { background: #eee !important; padding: 4px 8px; border-radius: 0; border-bottom: 2px solid #000; font-size: 13px; text-align: center; }
-            .shelf-body { flex: 1; padding: 4px; gap: 4px; }
-            .slot { border: 1px solid #666; border-radius: 0; justify-content: center; }
-            .slot.expanded { border: 2px solid #000; background: transparent; }
-            .slot-header { font-size: 10px; margin-bottom: 3px; text-align: center; }
-            select { border: none; appearance: none; -webkit-appearance: none; font-weight: bold; color: #000; font-size: 14px; padding: 0; text-align: center; height: auto; }
-            input[type="number"] { border: none; font-size: 24px; padding: 0; text-align: right; background: transparent; height: auto; }
-            .qty-unit { font-size: 14px; color: #000; margin-left: 2px; margin-bottom: 2px; align-self: flex-end; }
+            .header, #app-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
+            #print-container { display: flex !important; flex-direction: column; height: 287mm; }
+            
+            .print-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 4mm; }
+            .print-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 4mm; flex: 1; }
+            .print-block { border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; }
+            .print-block-title { background: #ddd; border-bottom: 2px solid #000; text-align: center; font-weight: bold; font-size: 12px; padding: 3px 0; display: flex; justify-content: center; align-items: center; gap: 8px; }
+            .print-shelf { border-bottom: 1px solid #000; display: flex; flex-direction: column; flex: 1; }
+            .print-shelf:last-child { border-bottom: none; }
+            .print-shelf-title { font-size: 9px; font-weight: bold; padding: 1px 4px; background: #f9f9f9; border-bottom: 1px dashed #999; }
+            .print-shelf-items { display: flex; flex: 1; }
+            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; }
+            .print-slot:last-child { border-right: none; }
+            .print-name { font-size: 9px; line-height: 1.1; text-align: center; min-height: 20px; display: flex; align-items: center; word-break: break-all; }
+            .print-qty { font-size: 10px; margin-top: 2px; }
+            .print-qty-num { font-size: 14px; font-weight: bold; }
         }
     </style>
 </head>
@@ -147,7 +155,7 @@
 
 <div class="header">
     <div class="header-left">
-        <div style="font-weight: bold; font-size: 0.9em;">フライヤー仕込み表</div>
+        <div style="font-weight: bold; font-size: 0.9em;">フライヤー仕込み表（東海版）</div>
         <div class="save-status" id="save-indicator">✓ 自動保存</div>
     </div>
     <div class="total-display" id="grand-total">¥0</div>
@@ -184,6 +192,8 @@
     </div>
 </div>
 
+<div id="print-container"></div>
+
 <div class="bottom-nav">
     <div class="btn-group">
         <button class="btn" id="btn-weekday" onclick="setDay('weekday')">平日</button>
@@ -197,7 +207,7 @@
     <div class="action-btns">
         <button class="btn-sub" onclick="openMaster()">商品編集</button>
         <button class="btn-sub" style="background:#0066cc;" onclick="openCopyModal()">🔄 コピー</button>
-        <button class="btn-main" onclick="window.print()">🖨️ 印刷出力</button>
+        <button class="btn-main" onclick="executePrint()">🖨️ 全体印刷</button>
     </div>
 </div>
 
@@ -219,8 +229,7 @@
     <div style="background:#f4f5f7; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #ddd;">
         <p style="margin:0; font-size:0.95em; color:#333; line-height:1.5;" id="copy-message"></p>
     </div>
-    <div id="copy-btn-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 25px;">
-        </div>
+    <div id="copy-btn-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 25px;"></div>
     <button class="btn-sub" style="width:100%; padding:14px; font-size:15px; background:#666;" onclick="closeCopyModal()">キャンセル</button>
 </div>
 
@@ -409,6 +418,74 @@
         if(!isInit) saveSysState();
     }
 
+    // ========== 一括印刷機能 ==========
+    function executePrint() {
+        const container = document.getElementById('print-container');
+        let html = '<div class="print-title">フライヤー仕込み表（東海版）</div><div class="print-grid">';
+        
+        const days = [{id:'weekday', label:'平日'}, {id:'holiday', label:'土日祝'}];
+        const times = [{id:'morning', label:'朝'}, {id:'noon', label:'昼'}, {id:'night', label:'夜'}];
+        
+        // 朝(平日・休日) → 昼(平日・休日) → 夜(平日・休日) の順に配置
+        times.forEach(time => {
+            days.forEach(day => {
+                const key = `${day.id}_${time.id}`;
+                const slotsData = appData[key];
+                
+                // ブロックごとの合計金額計算
+                let total = 0;
+                for (let s = 1; s <= 4; s++) {
+                    if (sysState.hidden[s]) continue;
+                    for (let i = 0; i < 4; i++) {
+                        const data = slotsData[s][i];
+                        const p = productMaster.find(x => x.name === data.name);
+                        if (p) total += (Number(p.price) * (Number(data.qty) || 0));
+                        if (data.span === 2) i++;
+                    }
+                }
+                
+                html += `
+                <div class="print-block">
+                    <div class="print-block-title">
+                        <span>【${day.label} - ${time.label}】</span>
+                        <span style="font-weight:normal; font-size:10px;">合計: ¥${Math.floor(total).toLocaleString()}</span>
+                    </div>`;
+                    
+                for (let s = 1; s <= 4; s++) {
+                    if (sysState.hidden[s]) continue;
+                    html += `
+                    <div class="print-shelf">
+                        <div class="print-shelf-title">${s}段目</div>
+                        <div class="print-shelf-items">`;
+                    
+                    for (let i = 0; i < 4; i++) {
+                        const data = slotsData[s][i];
+                        const flex = data.span === 2 ? 2 : 1;
+                        const name = data.name === "未設定" ? "" : data.name;
+                        const qtyHtml = data.qty > 0 ? `<span class="print-qty-num">${data.qty}</span>個` : '';
+                        
+                        html += `
+                            <div class="print-slot" style="flex:${flex};">
+                                <div class="print-name">${name}</div>
+                                <div class="print-qty">${qtyHtml}</div>
+                            </div>`;
+                        if (data.span === 2) i++;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+            });
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // DOMが更新されてから印刷を呼び出す
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+
     // ========== コピー機能 ==========
     function openCopyModal() {
         const timeLabels = { 'morning': '朝', 'noon': '昼', 'night': '夜' };
@@ -435,16 +512,13 @@
         document.getElementById('copy-modal').style.display = 'block';
     }
 
-    function closeCopyModal() {
-        document.getElementById('copy-modal').style.display = 'none';
-    }
+    function closeCopyModal() { document.getElementById('copy-modal').style.display = 'none'; }
 
     function executeCopy(sourceTime) {
         const targetKey = `${currentDay}_${currentTime}`;
         const sourceKey = `${currentDay}_${sourceTime}`;
         
         if(confirm('現在の配置と個数が上書きされます。本当によろしいですか？')) {
-            // データをディープコピー（参照を切って完全に複製）
             appData[targetKey] = JSON.parse(JSON.stringify(appData[sourceKey]));
             localStorage.setItem('sej_flyer_data_v4', JSON.stringify(appData));
             renderAllShelves();
@@ -467,13 +541,9 @@
         for(let i=0; i<lines.length; i+=2) {
             const itemName = lines[i] ? lines[i].trim() : '';
             const priceStr = lines[i+1] ? lines[i+1] : '';
-            
             const match = priceStr.match(/[\d.]+/);
             const itemPrice = match ? parseFloat(match[0]) : 0;
-
-            if(itemName && itemName !== "未設定") {
-                newList.push({ name: itemName, price: itemPrice });
-            }
+            if(itemName && itemName !== "未設定") { newList.push({ name: itemName, price: itemPrice }); }
         }
         productMaster = newList;
         localStorage.setItem('sej_flyer_master_v4', JSON.stringify(productMaster));
@@ -494,10 +564,8 @@
     if (savedMaster) productMaster = JSON.parse(savedMaster);
     
     initData();
-    
     document.getElementById(`btn-${sysState.day}`).classList.add('active');
     document.getElementById(`btn-${sysState.time}`).classList.add('active');
-    
     renderAllShelves();
 
 </script>
