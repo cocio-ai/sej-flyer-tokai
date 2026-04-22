@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>セブン仕込み表 Mobile 東海版 (視認性・合計金額強化版)</title>
+    <title>セブン仕込み表 Mobile 東海版 (完全版)</title>
     <style>
         :root {
             --711-green: #008060;
@@ -92,11 +92,12 @@
             text-align: center; text-overflow: ellipsis; height: 26px;
         }
         
-        /* 個数入力欄 */
+        /* 個数入力欄（スクロール選択式） */
         .qty-row { display: flex; align-items: center; justify-content: center; gap: 3px; }
-        input[type="number"] {
-            flex: 1; min-width: 0; padding: 4px; font-size: 16px; text-align: center;
-            font-weight: bold; border: 1px solid #ccc; border-radius: 4px; height: 30px;
+        .qty-select {
+            flex: 1; min-width: 0; padding: 4px; font-size: 18px; text-align: center; text-align-last: center;
+            font-weight: bold; border: 1px solid #ccc; border-radius: 4px; height: 34px;
+            background: #fff; color: #000;
         }
         .qty-unit { font-size: 12px; font-weight: bold; color: #555; white-space: nowrap; }
 
@@ -125,62 +126,70 @@
         textarea { width: 100%; height: 50vh; margin: 10px 0; padding: 10px; border: 1px solid #ccc; font-size: 13px; }
 
         /* =========================================
-           プロ仕様・一括印刷専用スタイル（視認性強化・1枚強制）
+           プロ仕様・一括印刷専用スタイル（システム内蔵 85%縮小版）
            ========================================= */
-        #print-container { display: none; }
+        #print-wrapper { display: none; }
         
         @media print {
+            /* Safari強制余白を排除 */
             @page { size: A4 portrait; margin: 0 !important; }
-            body { padding: 5mm; margin: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", "Helvetica Neue", Arial, sans-serif; }
+            body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", "Helvetica Neue", Arial, sans-serif; }
             .header, #app-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            #print-container { display: flex !important; flex-direction: column; height: 285mm; max-height: 285mm; overflow: hidden; page-break-after: avoid; page-break-before: avoid; }
+            /* 【魔法の縮小ラッパー】
+               A4用紙 (幅210mm×高さ297mm) に対して、枠をわざと大きく作り、それを85%に縮小してA4にピッタリはめる */
+            #print-wrapper {
+                display: block !important;
+                width: 247mm;   
+                height: 349mm;  
+                transform: scale(0.85);
+                transform-origin: top left;
+                overflow: hidden;
+            }
+
+            #print-container { 
+                display: flex; flex-direction: column; 
+                height: 100%; padding: 8mm; box-sizing: border-box; 
+            }
             
-            /* 印刷ヘッダー（注意書き＆1日合計金額） */
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 2mm; flex-shrink: 0; }
-            .print-header-left { display: flex; flex-direction: column; gap: 2px; }
-            .print-title { font-size: 18px; font-weight: 900; letter-spacing: 1px; }
-            .print-warning { font-size: 10px; color: #ee0000; font-weight: bold; border: 1px solid #ee0000; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
-            .print-date { font-size: 9px; color: #555; }
+            /* 印刷ヘッダー */
+            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 2mm; flex-shrink: 0; }
+            .print-header-left { display: flex; flex-direction: column; gap: 3px; }
+            .print-title { font-size: 20px; font-weight: 900; letter-spacing: 1px; }
+            .print-warning { font-size: 12px; color: #ee0000; font-weight: bold; }
+            .print-date { font-size: 11px; color: #555; }
             
-            .print-daily-total { display: flex; flex-direction: column; gap: 2px; background: #f9f9f9; border: 1px solid #ccc; padding: 4px 8px; border-radius: 4px; text-align: right; }
-            .print-daily-total div { font-size: 11px; font-weight: bold; }
-            .print-daily-total span { font-size: 14px; color: #000; margin-left: 5px; }
+            .print-daily-total { display: flex; flex-direction: column; gap: 2px; background: #f9f9f9; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; text-align: right; }
+            .print-daily-total div { font-size: 13px; font-weight: bold; }
+            .print-daily-total span { font-size: 16px; color: #000; margin-left: 5px; }
 
             /* グリッドレイアウト */
-            .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
-            .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
+            .print-grid { display: flex; flex-direction: column; gap: 4mm; flex: 1; min-height: 0; overflow: hidden; }
+            .print-row { display: flex; flex-direction: row; gap: 4mm; flex: 1; min-height: 0; }
             
             .print-block { flex: 1; border: 2px solid #000; display: grid; grid-template-rows: auto 1fr 1fr 1fr 1fr; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
             
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 8px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; }
+            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; color: #fff; font-weight: bold; font-size: 14px; border-bottom: 2px solid #000; height: 24px; }
             .print-block-title.weekday { background-color: var(--print-blue); }
             .print-block-title.holiday { background-color: var(--print-red); }
-            .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 8px; }
+            .print-block-total { font-size: 11px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 8px; }
 
             .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
             .print-shelf:last-child { border-bottom: none; }
             
-            .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 2px 0; color: #333; }
+            .print-shelf-label { width: 18px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; padding: 2px 0; color: #333; }
             
             .print-slots { display: flex; flex: 1; min-height: 0; }
             .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
             .print-slot:last-child { border-right: none; }
             
-            /* 商品名と個数の視認性強化 */
-            .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
-            
-            .print-qty { font-size: 22px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 2px; }
+            .print-name { font-size: 12px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
+            .print-qty { font-size: 24px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 2px; }
             .print-qty.zero { color: #ccc; font-size: 14px; font-weight: normal; }
 
-            /* 目隠し機能のCSS */
-            .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #fff !important; }
+            /* 目隠し機能のCSS（文字を消してただの黒塗りに） */
+            .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-shelf.hidden-shelf * { visibility: hidden !important; }
-            .print-shelf.hidden-shelf::after {
-                content: "目隠し";
-                position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-                color: #fff !important; font-size: 16px; font-weight: bold; letter-spacing: 6px; visibility: visible !important;
-            }
         }
     </style>
 </head>
@@ -225,7 +234,9 @@
     </div>
 </div>
 
-<div id="print-container"></div>
+<div id="print-wrapper">
+    <div id="print-container"></div>
+</div>
 
 <div class="bottom-nav">
     <div class="btn-group">
@@ -266,9 +277,19 @@
 </div>
 
 <script>
-    let sysState = JSON.parse(localStorage.getItem('sej_flyer_sys_v4')) || {
-        day: 'weekday', time: 'morning', hidden: {1:false, 2:false, 3:false, 4:false}
-    };
+    // データ保存先 v5 
+    let sysState = JSON.parse(localStorage.getItem('sej_flyer_sys_v5'));
+    if (!sysState || typeof sysState.hidden['weekday_morning'] === 'undefined') {
+        sysState = { day: 'weekday', time: 'morning', hidden: {} };
+        const daysArr = ['weekday', 'holiday'];
+        const timesArr = ['morning', 'noon', 'night'];
+        daysArr.forEach(d => {
+            timesArr.forEach(t => {
+                sysState.hidden[`${d}_${t}`] = {1:false, 2:false, 3:false, 4:false};
+            });
+        });
+    }
+    
     let currentDay = sysState.day;
     let currentTime = sysState.time;
     
@@ -290,12 +311,10 @@
     ];
 
     let productMaster = [...defaultMaster];
-    let appData = JSON.parse(localStorage.getItem('sej_flyer_data_v4')) || {};
-
-    function flashSaveIndicator() { const ind = document.getElementById('save-indicator'); ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0.5'; }, 800); }
-    function saveSysState() { sysState.day = currentDay; sysState.time = currentTime; localStorage.setItem('sej_flyer_sys_v4', JSON.stringify(sysState)); flashSaveIndicator(); }
-
-    function initData() {
+    let appData = JSON.parse(localStorage.getItem('sej_flyer_data_v5'));
+    
+    if (!appData) {
+        appData = JSON.parse(localStorage.getItem('sej_flyer_data_v4')) || {};
         const days = ['weekday', 'holiday'];
         const times = ['morning', 'noon', 'night'];
         days.forEach(d => {
@@ -307,8 +326,24 @@
                 }
             });
         });
-        for(let i=1; i<=4; i++) { const cb = document.getElementById(`check-${i}`); cb.checked = sysState.hidden[i]; toggleShelf(i, true); }
+        localStorage.setItem('sej_flyer_data_v5', JSON.stringify(appData));
     }
+
+    function flashSaveIndicator() { const ind = document.getElementById('save-indicator'); ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0.5'; }, 800); }
+    function saveSysState() { sysState.day = currentDay; sysState.time = currentTime; localStorage.setItem('sej_flyer_sys_v5', JSON.stringify(sysState)); flashSaveIndicator(); }
+
+    function updateHideCheckboxes() {
+        const key = `${currentDay}_${currentTime}`;
+        for(let i=1; i<=4; i++) {
+            const cb = document.getElementById(`check-${i}`);
+            cb.checked = sysState.hidden[key][i];
+            const shelf = document.getElementById(`shelf-${i}`);
+            if(cb.checked) shelf.classList.add('hidden');
+            else shelf.classList.remove('hidden');
+        }
+    }
+
+    function initData() { updateHideCheckboxes(); }
 
     function renderAllShelves() { for (let s = 1; s <= 4; s++) renderShelf(s); calcTotal(); }
 
@@ -332,6 +367,11 @@
                 return `<option value="${p.name}" ${p.name === data.name ? 'selected' : ''}>${displayName}</option>`;
             }).join('');
 
+            let qtyOptionsHtml = '';
+            for(let q=0; q<=20; q++) {
+                qtyOptionsHtml += `<option value="${q}" ${data.qty === q ? 'selected' : ''}>${q}</option>`;
+            }
+
             let btnHtml = '';
             if (isExpanded) { btnHtml = `<button class="expand-btn" onclick="toggleSpan(${shelfNum}, ${i})">>< 1F戻す</button>`; } 
             else if (i < 3 && slots[i+1]) { btnHtml = `<button class="expand-btn" onclick="toggleSpan(${shelfNum}, ${i})">◀▶ 2F展開</button>`; }
@@ -339,15 +379,18 @@
             slotEl.innerHTML = `
                 <div class="slot-header"><span>${isExpanded ? '2F展開' : '1F'}</span>${btnHtml}</div>
                 <select onchange="updateData(${shelfNum}, ${i}, 'name', this.value)">${optionsHtml}</select>
-                <div class="qty-row"><input type="number" value="${data.qty}" min="0" oninput="updateData(${shelfNum}, ${i}, 'qty', this.value)"><span class="qty-unit">個</span></div>
+                <div class="qty-row">
+                    <select class="qty-select" onchange="updateData(${shelfNum}, ${i}, 'qty', this.value)">${qtyOptionsHtml}</select>
+                    <span class="qty-unit">個</span>
+                </div>
             `;
             body.appendChild(slotEl);
             if (isExpanded) i++;
         }
     }
 
-    function updateData(shelfNum, slotIndex, field, value) { const key = `${currentDay}_${currentTime}`; if (field === 'qty') value = parseInt(value) || 0; appData[key][shelfNum][slotIndex][field] = value; localStorage.setItem('sej_flyer_data_v4', JSON.stringify(appData)); calcTotal(); flashSaveIndicator(); }
-    function toggleSpan(shelfNum, slotIndex) { const key = `${currentDay}_${currentTime}`; const slots = appData[key][shelfNum]; if (slots[slotIndex].span === 1) { slots[slotIndex].span = 2; if (slotIndex + 1 < 4) slots[slotIndex + 1].span = 1; } else { slots[slotIndex].span = 1; } localStorage.setItem('sej_flyer_data_v4', JSON.stringify(appData)); renderShelf(shelfNum); calcTotal(); flashSaveIndicator(); }
+    function updateData(shelfNum, slotIndex, field, value) { const key = `${currentDay}_${currentTime}`; if (field === 'qty') value = parseInt(value) || 0; appData[key][shelfNum][slotIndex][field] = value; localStorage.setItem('sej_flyer_data_v5', JSON.stringify(appData)); calcTotal(); flashSaveIndicator(); }
+    function toggleSpan(shelfNum, slotIndex) { const key = `${currentDay}_${currentTime}`; const slots = appData[key][shelfNum]; if (slots[slotIndex].span === 1) { slots[slotIndex].span = 2; if (slotIndex + 1 < 4) slots[slotIndex + 1].span = 1; } else { slots[slotIndex].span = 1; } localStorage.setItem('sej_flyer_data_v5', JSON.stringify(appData)); renderShelf(shelfNum); calcTotal(); flashSaveIndicator(); }
 
     function calcTotal() {
         let total = 0;
@@ -366,52 +409,56 @@
         document.getElementById('grand-total').textContent = `売価合計: ¥${Math.floor(total).toLocaleString()}`;
     }
 
-    function setDay(day) { currentDay = day; document.getElementById('btn-weekday').classList.toggle('active', day === 'weekday'); document.getElementById('btn-holiday').classList.toggle('active', day === 'holiday'); saveSysState(); renderAllShelves(); }
-    function setTime(time) { currentTime = time; ['morning','noon','night'].forEach(t => { document.getElementById(`btn-${t}`).classList.toggle('active', time === t); }); saveSysState(); renderAllShelves(); }
-    function toggleShelf(n, isInit = false) { const shelf = document.getElementById(`shelf-${n}`); const checkbox = document.getElementById(`check-${n}`); if(checkbox.checked) { shelf.classList.add('hidden'); } else { shelf.classList.remove('hidden'); } sysState.hidden[n] = checkbox.checked; if(!isInit) saveSysState(); }
+    function setDay(day) { currentDay = day; document.getElementById('btn-weekday').classList.toggle('active', day === 'weekday'); document.getElementById('btn-holiday').classList.toggle('active', day === 'holiday'); saveSysState(); updateHideCheckboxes(); renderAllShelves(); }
+    function setTime(time) { currentTime = time; ['morning','noon','night'].forEach(t => { document.getElementById(`btn-${t}`).classList.toggle('active', time === t); }); saveSysState(); updateHideCheckboxes(); renderAllShelves(); }
+    
+    function toggleShelf(n, isInit = false) {
+        const shelf = document.getElementById(`shelf-${n}`);
+        const checkbox = document.getElementById(`check-${n}`);
+        if(checkbox.checked) { shelf.classList.add('hidden'); } else { shelf.classList.remove('hidden'); }
+        const key = `${currentDay}_${currentTime}`;
+        sysState.hidden[key][n] = checkbox.checked;
+        if(!isInit) saveSysState();
+    }
 
-    // ========== 印刷処理（1日合計計算 ＆ 視認性強化版） ==========
+    // ========== 印刷処理 ==========
     function executePrint() {
         const container = document.getElementById('print-container');
         const now = new Date();
         const dateString = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 出力`;
 
-        // 全体の1日合計を計算
         let totalDailyWeekday = 0;
         let totalDailyHoliday = 0;
         const times = [{id:'morning', label:'🌅 朝の仕込み'}, {id:'noon', label:'☀️ 昼の仕込み'}, {id:'night', label:'🌙 夜の仕込み'}];
         
         times.forEach(time => {
-            // 平日
             for(let s=1; s<=4; s++) {
-                if(sysState.hidden[s]) continue;
-                for(let i=0; i<4; i++){
-                    const data = appData[`weekday_${time.id}`][s][i];
-                    if(!data) continue;
-                    const p = productMaster.find(x => x.name === data.name);
-                    if(p) totalDailyWeekday += (Number(p.price) * (Number(data.qty) || 0));
-                    if(data.span === 2) i++;
+                if(!sysState.hidden[`weekday_${time.id}`][s]) {
+                    for(let i=0; i<4; i++){
+                        const data = appData[`weekday_${time.id}`][s][i];
+                        if(!data) continue;
+                        const p = productMaster.find(x => x.name === data.name);
+                        if(p) totalDailyWeekday += (Number(p.price) * (Number(data.qty) || 0));
+                        if(data.span === 2) i++;
+                    }
                 }
-            }
-            // 休日
-            for(let s=1; s<=4; s++) {
-                if(sysState.hidden[s]) continue;
-                for(let i=0; i<4; i++){
-                    const data = appData[`holiday_${time.id}`][s][i];
-                    if(!data) continue;
-                    const p = productMaster.find(x => x.name === data.name);
-                    if(p) totalDailyHoliday += (Number(p.price) * (Number(data.qty) || 0));
-                    if(data.span === 2) i++;
+                if(!sysState.hidden[`holiday_${time.id}`][s]) {
+                    for(let i=0; i<4; i++){
+                        const data = appData[`holiday_${time.id}`][s][i];
+                        if(!data) continue;
+                        const p = productMaster.find(x => x.name === data.name);
+                        if(p) totalDailyHoliday += (Number(p.price) * (Number(data.qty) || 0));
+                        if(data.span === 2) i++;
+                    }
                 }
             }
         });
 
-        // 印刷用ヘッダー（注意書き＋合計金額）
         let html = `
             <div class="print-header">
                 <div class="print-header-left">
                     <div class="print-title">フライヤー仕込み表（東海版）</div>
-                    <div class="print-warning">【1枚で収まらない場合は、印刷設定で縮小(85%目安)して調整して下さい】</div>
+                    <div class="print-warning">【1枚で収まらない場合は縮小して調整して下さい】</div>
                     <div class="print-date">${dateString}</div>
                 </div>
                 <div class="print-daily-total">
@@ -432,7 +479,7 @@
                 
                 let shiftTotal = 0;
                 for (let s = 1; s <= 4; s++) {
-                    if (sysState.hidden[s]) continue;
+                    if (sysState.hidden[key][s]) continue;
                     for (let i = 0; i < 4; i++) {
                         const data = slotsData[s][i];
                         if (!data) continue;
@@ -445,7 +492,7 @@
                 html += `<div class="print-block"><div class="print-block-title ${day.class}"><span>${day.label}：${time.label}</span><span class="print-block-total">計 ¥${Math.floor(shiftTotal).toLocaleString()}</span></div>`;
                     
                 for (let s = 1; s <= 4; s++) {
-                    const isShelfHidden = sysState.hidden[s];
+                    const isShelfHidden = sysState.hidden[key][s];
                     const shelfClass = isShelfHidden ? "print-shelf hidden-shelf" : "print-shelf";
 
                     html += `<div class="${shelfClass}"><div class="print-shelf-label">${s}段</div><div class="print-slots">`;
@@ -497,15 +544,15 @@
     }
 
     function closeCopyModal() { document.getElementById('copy-modal').style.display = 'none'; }
-    function executeCopy(sourceTime) { const targetKey = `${currentDay}_${currentTime}`; const sourceKey = `${currentDay}_${sourceTime}`; if(confirm('上書きされます。よろしいですか？')) { appData[targetKey] = JSON.parse(JSON.stringify(appData[sourceKey])); localStorage.setItem('sej_flyer_data_v4', JSON.stringify(appData)); renderAllShelves(); closeCopyModal(); flashSaveIndicator(); } }
+    function executeCopy(sourceTime) { const targetKey = `${currentDay}_${currentTime}`; const sourceKey = `${currentDay}_${sourceTime}`; if(confirm('上書きされます。よろしいですか？')) { appData[targetKey] = JSON.parse(JSON.stringify(appData[sourceKey])); sysState.hidden[targetKey] = JSON.parse(JSON.stringify(sysState.hidden[sourceKey])); localStorage.setItem('sej_flyer_data_v5', JSON.stringify(appData)); saveSysState(); updateHideCheckboxes(); renderAllShelves(); closeCopyModal(); flashSaveIndicator(); } }
 
     // ========== マスター管理 ==========
     function openMaster() { document.getElementById('master-modal').style.display = 'block'; document.getElementById('master-input').value = productMaster.map(p => `${p.name}\n${p.price}`).join('\n'); }
     function closeMaster() { document.getElementById('master-modal').style.display = 'none'; }
-    function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const itemName = lines[i] ? lines[i].trim() : ''; const priceStr = lines[i+1] ? lines[i+1] : ''; const match = priceStr.match(/[\d.]+/); const itemPrice = match ? parseFloat(match[0]) : 0; if(itemName && itemName !== "未設定") { newList.push({ name: itemName, price: itemPrice }); } } productMaster = newList; localStorage.setItem('sej_flyer_master_v4', JSON.stringify(productMaster)); renderAllShelves(); closeMaster(); flashSaveIndicator(); }
-    function resetMaster() { if(confirm("商品リストを初期状態（ザクチキ等を含む最新版）に戻しますか？")) { productMaster = [...defaultMaster]; document.getElementById('master-input').value = productMaster.map(p => `${p.name}\n${p.price}`).join('\n'); saveMaster(); } }
+    function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const itemName = lines[i] ? lines[i].trim() : ''; const priceStr = lines[i+1] ? lines[i+1] : ''; const match = priceStr.match(/[\d.]+/); const itemPrice = match ? parseFloat(match[0]) : 0; if(itemName && itemName !== "未設定") { newList.push({ name: itemName, price: itemPrice }); } } productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(productMaster)); renderAllShelves(); closeMaster(); flashSaveIndicator(); }
+    function resetMaster() { if(confirm("商品リストを初期状態（最新版）に戻しますか？")) { productMaster = [...defaultMaster]; document.getElementById('master-input').value = productMaster.map(p => `${p.name}\n${p.price}`).join('\n'); saveMaster(); } }
 
-    const savedMaster = localStorage.getItem('sej_flyer_master_v4'); if (savedMaster) productMaster = JSON.parse(savedMaster);
+    const savedMaster = localStorage.getItem('sej_flyer_master_v5'); if (savedMaster) productMaster = JSON.parse(savedMaster);
     initData();
     document.getElementById(`btn-${sysState.day}`).classList.add('active');
     document.getElementById(`btn-${sysState.time}`).classList.add('active');
