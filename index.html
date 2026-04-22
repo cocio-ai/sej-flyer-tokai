@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>セブン仕込み表 Mobile 東海版 (1枚収め最適化)</title>
+    <title>セブン仕込み表 Mobile 東海版 (完全1枚収束版)</title>
     <style>
         :root {
             --711-green: #008060;
@@ -125,44 +125,46 @@
         textarea { width: 100%; height: 50vh; margin: 10px 0; padding: 10px; border: 1px solid #ccc; font-size: 13px; }
 
         /* =========================================
-           プロ仕様・一括印刷専用スタイル（1枚収め特化）
+           プロ仕様・一括印刷専用スタイル（完全1枚強制）
            ========================================= */
         #print-container { display: none; }
         
         @media print {
-            /* Safariのデフォ余白を考慮し、マージンは最小に */
-            @page { size: A4 portrait; margin: 5mm; }
-            body { padding: 0; margin: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            /* Safariの強制ヘッダーフッターを回避するためマージンを0に */
+            @page { size: A4 portrait; margin: 0; }
+            
+            /* プリンタの印字領域を確保するため、body自体に内側余白(padding)をつける */
+            body { padding: 5mm; margin: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .header, #app-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            /* A4の高さ(297mm)からブラウザヘッダー分を引いた265mmで固定し、絶対にはみ出さないようにする */
-            #print-container { display: flex !important; flex-direction: column; height: 265mm; max-height: 265mm; font-family: sans-serif; overflow: hidden; page-break-inside: avoid; }
+            /* 全体の高さをA4ぴったりに制限し、はみ出しを絶対許さない */
+            #print-container { display: flex !important; flex-direction: column; height: 287mm; font-family: sans-serif; overflow: hidden; page-break-after: avoid; page-break-before: avoid; }
             
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; }
+            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
             .print-title { font-size: 16px; font-weight: 900; letter-spacing: 1px; }
             .print-date { font-size: 9px; color: #333; font-weight: bold; }
 
-            /* グリッドの隙間を縮小 */
-            .print-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 2mm; flex: 1; overflow: hidden; }
+            /* GridをやめてFlexの行(Row)構成にし、iPadの分割バグを防ぐ */
+            .print-grid { display: flex; flex-direction: column; gap: 2mm; flex: 1; min-height: 0; }
+            .print-row { display: flex; flex-direction: row; gap: 2mm; flex: 1; min-height: 0; }
             
-            .print-block { border: 2px solid #333; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; }
+            .print-block { flex: 1; border: 2px solid #333; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
             
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 11px; border-bottom: 2px solid #333; }
+            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 11px; border-bottom: 2px solid #333; flex-shrink: 0; }
             .print-block-title.weekday { background-color: var(--print-blue); }
             .print-block-title.holiday { background-color: var(--print-red); }
             .print-block-total { font-size: 9px; font-weight: normal; background: rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 8px; }
 
-            .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #999; overflow: hidden; }
+            .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #999; overflow: hidden; min-height: 0; }
             .print-shelf:last-child { border-bottom: none; }
             
             .print-shelf-label { width: 14px; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; border-right: 1px solid #999; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 2px 0; }
             
-            .print-slots { display: flex; flex: 1; }
-            .print-slot { border-right: 1px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; text-align: center; overflow: hidden; }
+            .print-slots { display: flex; flex: 1; min-height: 0; }
+            .print-slot { border-right: 1px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; text-align: center; overflow: hidden; min-height: 0; }
             .print-slot:last-child { border-right: none; }
             
-            /* 商品名が2行になっても枠を広げないように高さを固定 */
-            .print-name { font-size: 9px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; height: 22px; word-break: break-all; margin-bottom: 1px; }
+            .print-name { font-size: 9px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; }
             
             .print-qty { font-size: 16px; font-weight: 900; }
             .print-qty.zero { color: #bbb; font-size: 10px; font-weight: normal; }
@@ -434,7 +436,7 @@
         if(!isInit) saveSysState();
     }
 
-    // ========== スタッフ向け・プロ仕様一括印刷機能 ==========
+    // ========== 一括印刷機能（Flex強制1枚版） ==========
     function executePrint() {
         const container = document.getElementById('print-container');
         
@@ -459,7 +461,10 @@
             {id:'night', label:'🌙 夜の仕込み'}
         ];
         
+        // 縦に時間（行）、横に曜日（列）を並べるFlex構成
         times.forEach(time => {
+            html += `<div class="print-row">`; // 行を開始
+            
             days.forEach(day => {
                 const key = `${day.id}_${time.id}`;
                 const slotsData = appData[key];
@@ -504,13 +509,15 @@
                             </div>`;
                         if (data.span === 2) i++;
                     }
-                    html += `</div></div>`;
+                    html += `</div></div>`; // print-shelf / print-slots
                 }
-                html += `</div>`;
+                html += `</div>`; // print-block
             });
+            
+            html += `</div>`; // print-row 終了
         });
         
-        html += '</div>';
+        html += '</div>'; // print-grid 終了
         container.innerHTML = html;
         
         setTimeout(() => { window.print(); }, 150);
