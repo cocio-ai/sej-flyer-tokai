@@ -102,7 +102,9 @@
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             html, body { height: 100%; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif; }
-            .header, #app-container, .main-tab-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
+            
+            /* 【修正点】入力画面の view-fryer と view-bakery も印刷時に隠すよう追加しました */
+            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
             #print-wrapper { display: block !important; width: 100%; height: 230mm; max-height: 230mm; overflow: hidden; }
             #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm; box-sizing: border-box; }
@@ -166,7 +168,7 @@
     <div class="total-display" id="grand-total">¥0</div>
 </div>
 
-<div class="main-tab-container" id="app-container">
+<div class="main-tab-container">
     <button class="main-tab-btn active" id="tab-fryer" onclick="switchTab('fryer')">🍗 フライヤー</button>
     <button class="main-tab-btn" id="tab-bakery" onclick="switchTab('bakery')">🥐 焼成パン(常温)</button>
 </div>
