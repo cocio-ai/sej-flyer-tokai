@@ -105,8 +105,8 @@
             /* 入力画面関係は全て非表示 */
             .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            /* iPadの余白を避けつつ、自然に用紙を埋める安全な高さ(275mm)に変更 */
-            #print-wrapper { display: block !important; width: 100%; height: 275mm; max-height: 275mm; overflow: hidden; margin: 0 auto; }
+            /* iPad余白を回避する安全な高さ（250mm）に完全固定 */
+            #print-wrapper { display: block !important; width: 100%; height: 250mm; overflow: hidden; margin: 0 auto; }
             #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm 6mm; box-sizing: border-box; }
             
             .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 1mm; flex-shrink: 0; }
@@ -321,7 +321,7 @@
     function f_calcSum() { let sum=0; const slots=f_appData[`${globalDay}_${globalTime}`]; for(let s=1; s<=4; s++){ for(let i=0; i<4; i++){ const d=slots[s][i]; const p=f_productMaster.find(x=>x.name===d.name); sum+=(p?p.price:0)*(d.qty||0); if(d.span===2) i++; } } return Math.floor(sum); }
 
     /* =========================================================
-       パン・常温用データ＆ロジック (b_ prefix)
+       パン・常温用データ＆ロジック (b_ prefix) - 2フェイス展開対応
        ========================================================= */
     let b_sysState = JSON.parse(localStorage.getItem('sej_bakery_sys_v1'));
     if (!b_sysState || typeof b_sysState.hidden['weekday_morning'] === 'undefined') {
@@ -333,7 +333,7 @@
     let b_appData = JSON.parse(localStorage.getItem('sej_bakery_data_v1'));
     if (!b_appData) {
         b_appData = {};
-        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_appData[`${d}_${t}`] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[`${d}_${t}`][u][s] = [{name:"未設定",qty:0}, {name:"未設定",qty:0}]; } }); });
+        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_appData[`${d}_${t}`] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[`${d}_${t}`][u][s] = [{name:"未設定",qty:0, span: 1}, {name:"未設定",qty:0, span: 1}]; } }); });
     }
 
     function b_buildDOM(u) {
@@ -347,18 +347,36 @@
         const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML='';
         const slots=b_appData[`${globalDay}_${globalTime}`][u][s];
         for(let i=0; i<2; i++){
-            const d=slots[i]; const slotEl=document.createElement('div'); slotEl.className='slot';
+            const d=slots[i]; 
+            const isExp = d.span === 2;
+            const slotEl=document.createElement('div'); slotEl.className=`slot ${isExp ? 'expanded' : ''}`;
             const opts=b_productMaster.map(p=>`<option value="${p.name}" ${p.name===d.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts=''; for(let q=0; q<=20; q++) qtyOpts+=`<option value="${q}" ${d.qty===q?'selected':''}>${q}</option>`;
-            slotEl.innerHTML=`<div class="slot-header"><span>${i===0?'左フェイス':'右フェイス'}</span></div><select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
+            let btn = isExp ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">>< 1F戻す</button>` : (i===0 ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">◀▶ 2F展開</button>` : '');
+            slotEl.innerHTML=`<div class="slot-header"><span>${isExp ? '2フェイス展開' : (i===0?'左フェイス':'右フェイス')}</span>${btn}</div><select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
             body.appendChild(slotEl);
+            if(isExp) i++;
         }
     }
     function b_update(u, s, i, f, v) { if(f==='qty') v=parseInt(v)||0; b_appData[`${globalDay}_${globalTime}`][u][s][i][f]=v; localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); updateGrandTotal(); flashSaveIndicator(); }
+    
+    // パン用 2F展開切り替え
+    function b_toggleSpan(u, s, i) { 
+        const slots = b_appData[`${globalDay}_${globalTime}`][u][s]; 
+        if(!slots[i].span || slots[i].span === 1){ 
+            slots[i].span = 2; 
+            if(i+1 < 2) slots[i+1].span = 1; 
+        } else { 
+            slots[i].span = 1; 
+        } 
+        localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); 
+        b_renderShelf(u, s); updateGrandTotal(); flashSaveIndicator();
+    }
+
     function b_toggleShelf(u, s) { const chk=document.getElementById(`b-check-${u}-${s}`).checked; document.getElementById(`b-shelf-${u}-${s}`).classList.toggle('hidden', chk); b_sysState.hidden[`${globalDay}_${globalTime}`][u][s]=chk; localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); }
     function b_updateHideUI() { for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++){ const el=document.getElementById(`b-check-${u}-${s}`); if(!el)continue; const chk=b_sysState.hidden[`${globalDay}_${globalTime}`][u][s]; el.checked=chk; document.getElementById(`b-shelf-${u}-${s}`).classList.toggle('hidden',chk); } } }
     function b_setUnitCount(num) { b_sysState.unitCount=num; localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); document.getElementById('btn-unit-1').classList.toggle('active',num===1); document.getElementById('btn-unit-2').classList.toggle('active',num===2); document.getElementById('unit-section-2').style.display=num===2?'block':'none'; b_renderAll(); updateGrandTotal(); }
-    function b_calcSum() { let sum=0; const key=`${globalDay}_${globalTime}`; for(let u=1; u<=b_sysState.unitCount; u++){ for(let s=1; s<=4; s++){ for(let i=0; i<2; i++){ const d=b_appData[key][u][s][i]; const p=b_productMaster.find(x=>x.name===d.name); sum+=(p?p.price:0)*(d.qty||0); } } } return Math.floor(sum); }
+    function b_calcSum() { let sum=0; const key=`${globalDay}_${globalTime}`; for(let u=1; u<=b_sysState.unitCount; u++){ for(let s=1; s<=4; s++){ for(let i=0; i<2; i++){ const d=b_appData[key][u][s][i]; const p=b_productMaster.find(x=>x.name===d.name); sum+=(p?p.price:0)*(d.qty||0); if(d.span===2) i++; } } } return Math.floor(sum); }
 
     /* =========================================================
        UI制御・結合ロジック
@@ -455,18 +473,18 @@
         // --- パン版 印刷生成 ---
         else {
             const uCnt = b_sysState.unitCount;
-            times.forEach(t => { days.forEach(d => { let sum=0; for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[`${d.id}_${t.id}`][u][s]){ for(let i=0; i<2; i++){ const dt=b_appData[`${d.id}_${t.id}`][u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); } } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
+            times.forEach(t => { days.forEach(d => { let sum=0; for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[`${d.id}_${t.id}`][u][s]){ for(let i=0; i<2; i++){ const dt=b_appData[`${d.id}_${t.id}`][u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
             let html = `<div class="print-header mode-bakery"><div class="print-header-left"><div class="print-title"><span>常温パン仕込み表</span><span class="print-title-sub">（${uCnt}台運用）</span></div><div class="print-warning">※そのままA4に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-bakery">`;
             times.forEach(t => { html += `<div class="print-row">`; days.forEach(d => {
                 const slotsData = b_appData[`${d.id}_${t.id}`]; let shiftTotal=0;
-                for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[`${d.id}_${t.id}`][u][s]){ for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) shiftTotal+=p.price*(dt.qty||0); } } } }
+                for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[`${d.id}_${t.id}`][u][s]){ for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) shiftTotal+=p.price*(dt.qty||0); if(dt.span===2) i++; } } } }
                 html += `<div class="print-block"><div class="print-block-title ${d.class}"><span>${d.label}：${t.label}</span><span class="print-block-total">計 ¥${Math.floor(shiftTotal).toLocaleString()}</span></div><div class="print-units-container ${uCnt===2?'two-units':''}">`;
                 for(let u=1; u<=uCnt; u++){
                     html += `<div class="print-unit-col"><div class="print-unit-header">${u}台目</div>`;
                     for(let s=1; s<=4; s++){
                         const cls = b_sysState.hidden[`${d.id}_${t.id}`][u][s] ? "print-shelf hidden-shelf" : "print-shelf";
                         html += `<div class="${cls}"><div class="print-shelf-label">${s}段</div><div class="print-slots">`;
-                        for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; html+=`<div class="print-slot"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; }
+                        for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; const isExp = dt.span===2; html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; if(isExp) i++; }
                         html += `</div></div>`;
                     } html += `</div>`;
                 }
