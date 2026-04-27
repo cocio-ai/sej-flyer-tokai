@@ -140,7 +140,7 @@
         textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
 
         /* =========================================
-           プロ仕様・一括印刷専用スタイル（実寸80%・絶対1枚収め版）
+           プロ仕様・一括印刷専用スタイル（95%圧縮・絶対1枚収め版）
            ========================================= */
         #print-wrapper { display: none; }
         
@@ -149,56 +149,56 @@
             html, body { height: 100%; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", "Helvetica Neue", Arial, sans-serif; }
             .header, #app-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            /* iPadのSafariバグを防ぐため、最初からサイズを小さく設計し、高さを厳格に250mm（A4は297mm）でカット */
+            /* 全体の高さを「230mm」に制限。これでiPadの強制余白に絶対に干渉しなくなります */
             #print-wrapper {
                 display: block !important;
                 width: 100%;   
-                height: 250mm;  
-                max-height: 250mm;
+                height: 230mm;  
+                max-height: 230mm;
                 overflow: hidden;
             }
 
             #print-container { 
                 display: flex; flex-direction: column; 
-                height: 100%; padding: 5mm; box-sizing: border-box; 
+                height: 100%; padding: 4mm; box-sizing: border-box; 
             }
             
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 2mm; flex-shrink: 0; }
+            /* 余白やフォントサイズを全体的に少しずつ小さく（95%相当）して調整 */
+            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
             .print-header-left { display: flex; flex-direction: column; gap: 2px; }
             
-            .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 8px; }
-            .print-title-sub { font-size: 11px; color: #555; font-weight: 700; letter-spacing: 0; }
+            .print-title { font-size: 17px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
+            .print-title-sub { font-size: 10px; color: #555; font-weight: 700; }
             
-            /* 縮小不要になったので注意書きを変更 */
-            .print-warning { font-size: 11px; color: #555; font-weight: bold; }
-            .print-date { font-size: 10px; color: #555; }
+            .print-warning { font-size: 10px; color: #555; font-weight: bold; }
+            .print-date { font-size: 9px; color: #555; }
             
-            .print-daily-total { display: flex; flex-direction: column; gap: 2px; background: #f9f9f9; border: 1px solid #ccc; padding: 4px 8px; border-radius: 4px; text-align: right; }
-            .print-daily-total div { font-size: 11px; font-weight: bold; }
-            .print-daily-total span { font-size: 14px; color: #000; margin-left: 4px; }
+            .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
+            .print-daily-total div { font-size: 10px; font-weight: bold; }
+            .print-daily-total span { font-size: 13px; color: #000; margin-left: 3px; }
 
-            .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
-            .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
+            .print-grid { display: flex; flex-direction: column; gap: 2mm; flex: 1; min-height: 0; overflow: hidden; }
+            .print-row { display: flex; flex-direction: row; gap: 2mm; flex: 1; min-height: 0; }
             
             .print-block { flex: 1; border: 2px solid #000; display: grid; grid-template-rows: auto 1fr 1fr 1fr 1fr; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
             
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 8px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; }
+            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 11px; border-bottom: 2px solid #000; height: 18px; }
             .print-block-title.weekday { background-color: var(--print-blue); }
             .print-block-title.holiday { background-color: var(--print-red); }
-            .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 8px; }
+            .print-block-total { font-size: 9px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
 
             .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
             .print-shelf:last-child { border-bottom: none; }
             
-            .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 2px 0; color: #333; }
+            .print-shelf-label { width: 14px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
             
             .print-slots { display: flex; flex: 1; min-height: 0; }
-            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
+            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
             .print-slot:last-child { border-right: none; }
             
-            .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
-            .print-qty { font-size: 20px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 2px; }
-            .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
+            .print-name { font-size: 10px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
+            .print-qty { font-size: 18px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
+            .print-qty.zero { color: #ccc; font-size: 11px; font-weight: normal; }
 
             .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-shelf.hidden-shelf * { visibility: hidden !important; }
