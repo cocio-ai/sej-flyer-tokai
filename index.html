@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Store Planner - セブン仕込み統合ツール</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         :root {
             --711-green: #008060;
@@ -22,7 +23,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
             background-color: var(--bg-color); margin: 0;
-            padding: 10px 10px 200px 10px; color: var(--text-main);
+            padding: 10px 10px 220px 10px; color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -85,75 +86,68 @@
         .btn-group { display: flex; gap: 8px; margin-bottom: 12px; }
         .btn { flex: 1; border: none; padding: 12px 4px; border-radius: 12px; font-size: 14px; font-weight: 700; background: #f0f0f2; color: var(--text-sub); transition: all 0.2s ease; }
         .btn.active { background: var(--711-green); color: #fff; box-shadow: 0 4px 10px rgba(0, 128, 96, 0.2); }
-        .action-btns { display: flex; gap: 8px; }
-        .btn-sub { flex: 1; background: #3a3a3c; color: #fff; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; padding: 14px 4px;}
+        
+        /* アクションボタン（2列レイアウトに変更） */
+        .action-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .btn-sub, .btn-main { width: 100%; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; padding: 14px 4px; }
+        .btn-sub { background: #3a3a3c; color: #fff; }
         .btn-sub.copy { background: #007aff; }
-        .btn-main { flex: 1.5; background: var(--711-orange); color: #fff; font-size: 15px; padding: 14px 4px; border-radius: 12px; border: none; font-weight: 800; box-shadow: 0 4px 12px rgba(255, 102, 0, 0.25); transition: background 0.3s;}
+        .btn-main { background: var(--711-orange); color: #fff; box-shadow: 0 4px 12px rgba(255, 102, 0, 0.25); transition: background 0.3s;}
         
         /* モーダル */
-        #master-modal, #copy-modal { display: none; position: fixed; inset: 0; background: rgba(242, 244, 247, 0.98); z-index: 2000; padding: 20px; overflow-y: auto; }
+        #master-modal, #copy-modal, #image-modal { display: none; position: fixed; inset: 0; background: rgba(242, 244, 247, 0.98); z-index: 2000; padding: 20px; overflow-y: auto; }
         textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
 
         /* =========================================
-           一括印刷専用スタイル
+           印刷・画像エクスポート 共通レイアウト
+           (画面には表示されず、バックグラウンドでのみ構築されます)
            ========================================= */
         #print-wrapper { display: none; }
+        #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm 6mm; box-sizing: border-box; background: white; }
+        .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 1mm; flex-shrink: 0; }
+        .print-header-left { display: flex; flex-direction: column; gap: 2px; }
+        .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
+        .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
+        .print-warning { font-size: 10px; color: #555; font-weight: bold; }
+        .print-date { font-size: 10px; color: #555; }
+        .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
+        .print-daily-total div { font-size: 11px; font-weight: bold; }
+        .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
+        .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
+        .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
+        .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
+        .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; flex-shrink: 0;}
+        .print-block-title.weekday { background-color: var(--print-blue); }
+        .print-block-title.holiday { background-color: var(--print-red); }
+        .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
+        .print-units-container { display: flex; flex-direction: row; flex: 1; min-height: 0; }
+        .print-unit-col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #000; }
+        .print-unit-col:last-child { border-right: none; }
+        .print-unit-header { font-size: 10px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 2px 0; display: none; flex-shrink: 0;}
+        .two-units .print-unit-header { display: block; }
+        .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
+        .print-block > .print-shelf:last-child, .print-unit-col > .print-shelf:last-child { border-bottom: none; }
+        .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
+        .print-slots { display: flex; flex: 1; min-height: 0; }
+        .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
+        .print-slot:last-child { border-right: none; }
+        .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
+        .print-qty { font-size: 20px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
+        .mode-bakery .print-qty { font-size: 22px; } 
+        .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
+        .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .print-shelf.hidden-shelf * { visibility: hidden !important; }
+
+        /* [画像生成時の一時スタイル] */
+        .export-mode .header, .export-mode .main-tab-container, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
+        .export-mode #print-wrapper { display: block !important; width: 794px !important; height: 1050px !important; background: white; position: absolute; top: 0; left: 0; z-index: 9999; }
+        
+        /* [紙印刷用スタイル] */
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             html, body { height: 100%; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif; }
-            
-            /* 入力画面関係は全て非表示 */
-            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
-            
-            /* iPad余白を回避する安全な高さ（250mm）に完全固定 */
+            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
             #print-wrapper { display: block !important; width: 100%; height: 250mm; overflow: hidden; margin: 0 auto; }
-            #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm 6mm; box-sizing: border-box; }
-            
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 1mm; flex-shrink: 0; }
-            .print-header-left { display: flex; flex-direction: column; gap: 2px; }
-            .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
-            .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
-            .print-warning { font-size: 10px; color: #555; font-weight: bold; }
-            .print-date { font-size: 10px; color: #555; }
-            
-            .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
-            .print-daily-total div { font-size: 11px; font-weight: bold; }
-            .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
-
-            /* グリッド全体と行を「flex: 1」で隙間なく均等に引き伸ばす */
-            .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
-            .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
-            
-            .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; flex-shrink: 0;}
-            .print-block-title.weekday { background-color: var(--print-blue); }
-            .print-block-title.holiday { background-color: var(--print-red); }
-            .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
-
-            /* Bakery用の台数レイアウト */
-            .print-units-container { display: flex; flex-direction: row; flex: 1; min-height: 0; }
-            .print-unit-col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #000; }
-            .print-unit-col:last-child { border-right: none; }
-            .print-unit-header { font-size: 10px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 2px 0; display: none; flex-shrink: 0;}
-            .two-units .print-unit-header { display: block; }
-            
-            /* 各段（shelf）を均等に上下に伸ばすために「flex: 1」を再設定 */
-            .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
-            .print-block > .print-shelf:last-child, .print-unit-col > .print-shelf:last-child { border-bottom: none; }
-            .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
-            
-            /* マス目（slot）も均等に伸ばす */
-            .print-slots { display: flex; flex: 1; min-height: 0; }
-            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
-            .print-slot:last-child { border-right: none; }
-            
-            .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
-            .print-qty { font-size: 20px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
-            .mode-bakery .print-qty { font-size: 22px; } 
-            .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
-
-            .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .print-shelf.hidden-shelf * { visibility: hidden !important; }
         }
     </style>
 </head>
@@ -176,34 +170,10 @@
 </div>
 
 <div id="view-fryer">
-    <div class="shelf" id="f-shelf-1">
-        <div class="shelf-header">
-            <span>1段目（最上段）</span>
-            <label class="hide-label"><input type="checkbox" id="f-check-1" onchange="f_toggleShelf(1)"> 目隠し</label>
-        </div>
-        <div class="shelf-body"></div>
-    </div>
-    <div class="shelf" id="f-shelf-2">
-        <div class="shelf-header">
-            <span>2段目</span>
-            <label class="hide-label"><input type="checkbox" id="f-check-2" onchange="f_toggleShelf(2)"> 目隠し</label>
-        </div>
-        <div class="shelf-body"></div>
-    </div>
-    <div class="shelf" id="f-shelf-3">
-        <div class="shelf-header">
-            <span>3段目</span>
-            <label class="hide-label"><input type="checkbox" id="f-check-3" onchange="f_toggleShelf(3)"> 目隠し</label>
-        </div>
-        <div class="shelf-body"></div>
-    </div>
-    <div class="shelf" id="f-shelf-4">
-        <div class="shelf-header">
-            <span>4段目（最下段）</span>
-            <label class="hide-label"><input type="checkbox" id="f-check-4" onchange="f_toggleShelf(4)"> 目隠し</label>
-        </div>
-        <div class="shelf-body"></div>
-    </div>
+    <div class="shelf" id="f-shelf-1"><div class="shelf-header"><span>1段目（最上段）</span><label class="hide-label"><input type="checkbox" id="f-check-1" onchange="f_toggleShelf(1)"> 目隠し</label></div><div class="shelf-body"></div></div>
+    <div class="shelf" id="f-shelf-2"><div class="shelf-header"><span>2段目</span><label class="hide-label"><input type="checkbox" id="f-check-2" onchange="f_toggleShelf(2)"> 目隠し</label></div><div class="shelf-body"></div></div>
+    <div class="shelf" id="f-shelf-3"><div class="shelf-header"><span>3段目</span><label class="hide-label"><input type="checkbox" id="f-check-3" onchange="f_toggleShelf(3)"> 目隠し</label></div><div class="shelf-body"></div></div>
+    <div class="shelf" id="f-shelf-4"><div class="shelf-header"><span>4段目（最下段）</span><label class="hide-label"><input type="checkbox" id="f-check-4" onchange="f_toggleShelf(4)"> 目隠し</label></div><div class="shelf-body"></div></div>
 </div>
 
 <div id="view-bakery" style="display: none;">
@@ -211,14 +181,8 @@
         <button class="unit-toggle-btn active" id="btn-unit-1" onclick="b_setUnitCount(1)">1台で運用</button>
         <button class="unit-toggle-btn" id="btn-unit-2" onclick="b_setUnitCount(2)">2台で運用</button>
     </div>
-    <div class="unit-section" id="unit-section-1">
-        <div class="unit-title">1台目（向かって左）</div>
-        <div id="b-shelves-container-1"></div>
-    </div>
-    <div class="unit-section" id="unit-section-2" style="display: none;">
-        <div class="unit-title">2台目（向かって右）</div>
-        <div id="b-shelves-container-2"></div>
-    </div>
+    <div class="unit-section" id="unit-section-1"><div class="unit-title">1台目（向かって左）</div><div id="b-shelves-container-1"></div></div>
+    <div class="unit-section" id="unit-section-2" style="display: none;"><div class="unit-title">2台目（向かって右）</div><div id="b-shelves-container-2"></div></div>
 </div>
 
 <div id="print-wrapper">
@@ -238,19 +202,20 @@
     <div class="action-btns">
         <button class="btn-sub" onclick="openMaster()">商品編集</button>
         <button class="btn-sub copy" onclick="openCopyModal()">🔄 コピー</button>
-        <button class="btn-main" id="btn-print" onclick="executePrint()">🖨️ 全体印刷</button>
+        <button class="btn-sub" id="btn-image-save" style="background: #34c759; color: white;" onclick="executeImageSave()">📸 画像保存</button>
+        <button class="btn-main" id="btn-print" onclick="executePrint()">🖨️ 印刷</button>
     </div>
 </div>
 
 <div id="master-modal">
     <h3 style="margin-top:0;" id="master-modal-title">商品マスター更新</h3>
     <textarea id="master-input"></textarea>
-    <div class="action-btns" style="margin-bottom: 12px;">
-        <button class="btn-sub" style="background:#ee0000;" onclick="resetMaster()">初期状態に戻す</button>
+    <div class="action-btns" style="margin-bottom: 12px; display: flex;">
+        <button class="btn-sub" style="background:#ee0000; width:100%;" onclick="resetMaster()">初期状態に戻す</button>
     </div>
-    <div class="action-btns">
-        <button class="btn-sub" onclick="closeMaster()">戻る</button>
-        <button class="btn-main" onclick="saveMaster()">保存して反映</button>
+    <div class="action-btns" style="display: flex; gap: 8px;">
+        <button class="btn-sub" style="flex: 1;" onclick="closeMaster()">戻る</button>
+        <button class="btn-main" style="flex: 1;" onclick="saveMaster()">保存して反映</button>
     </div>
 </div>
 
@@ -260,119 +225,86 @@
         <p style="margin:0; font-size:14px; color:var(--text-main); line-height:1.5;" id="copy-message"></p>
     </div>
     <div id="copy-btn-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 24px;"></div>
-    <button class="btn-sub" style="width:100%;" onclick="closeCopyModal()">キャンセル</button>
+    <button class="btn-sub" style="width:100%; padding: 14px;" onclick="closeCopyModal()">キャンセル</button>
+</div>
+
+<div id="image-modal">
+    <h3 style="margin-top:0;">ネットプリント用画像</h3>
+    <p style="font-size: 13px; color: var(--711-red); font-weight: bold; background: #ffeeee; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
+        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存」をタップしてください。
+    </p>
+    <div id="image-result-container" style="text-align:center; overflow-y:auto; max-height:55vh; border:2px solid var(--border-color); border-radius: 8px; background:#fff; padding: 4px;">
+        </div>
+    <button class="btn-sub" style="width:100%; margin-top: 16px; padding: 14px;" onclick="closeImageModal()">閉じる</button>
 </div>
 
 <script>
     /* =========================================================
        共通・システム設定
        ========================================================= */
-    let currentTab = 'fryer'; // 'fryer' or 'bakery'
-    let globalDay = 'weekday';
-    let globalTime = 'morning';
-
-    // 最後に開いていたタブや時間を記憶
+    let currentTab = 'fryer'; let globalDay = 'weekday'; let globalTime = 'morning';
     let appPrefs = JSON.parse(localStorage.getItem('sej_app_prefs_v1')) || { tab: 'fryer', day: 'weekday', time: 'morning' };
     currentTab = appPrefs.tab; globalDay = appPrefs.day; globalTime = appPrefs.time;
-
-    function savePrefs() {
-        appPrefs = { tab: currentTab, day: globalDay, time: globalTime };
-        localStorage.setItem('sej_app_prefs_v1', JSON.stringify(appPrefs));
-        flashSaveIndicator();
-    }
+    function savePrefs() { appPrefs = { tab: currentTab, day: globalDay, time: globalTime }; localStorage.setItem('sej_app_prefs_v1', JSON.stringify(appPrefs)); flashSaveIndicator(); }
     function flashSaveIndicator() { const ind = document.getElementById('save-indicator'); ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0.5'; }, 800); }
 
     /* =========================================================
-       フライヤー用データ＆ロジック (f_ prefix)
+       フライヤー用データ＆ロジック
        ========================================================= */
-    let f_sysState = JSON.parse(localStorage.getItem('sej_flyer_sys_v5'));
-    if (!f_sysState || typeof f_sysState.hidden['weekday_morning'] === 'undefined') {
-        f_sysState = { hidden: {} };
-        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { f_sysState.hidden[`${d}_${t}`] = {1:false, 2:false, 3:false, 4:false}; }); });
-    }
+    let f_sysState = JSON.parse(localStorage.getItem('sej_flyer_sys_v5')) || { hidden: {} };
+    if(!f_sysState.hidden['weekday_morning']) { ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { f_sysState.hidden[`${d}_${t}`] = {1:false, 2:false, 3:false, 4:false}; }); }); }
     const f_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ななチキ", price: 250.56 }, { name: "ザクチキ", price: 250.56 }, { name: "揚げ鶏", price: 250.56 }, { name: "BIGポークフランク", price: 213.84 }, { name: "からあげ棒", price: 213.84 }, { name: "アメリカンドッグ", price: 150.12 }, { name: "カレーパン", price: 160.92 }, { name: "牛肉コロッケ", price: 108.00 }, { name: "五目春巻き", price: 129.60 }, { name: "ハッシュポテト", price: 129.60 }, { name: "ささみ揚げ", price: 190.08 }];
     let f_productMaster = JSON.parse(localStorage.getItem('sej_flyer_master_v5')) || [...f_defaultMaster];
     let f_appData = JSON.parse(localStorage.getItem('sej_flyer_data_v5'));
-    if (!f_appData) {
-        f_appData = {};
-        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { f_appData[`${d}_${t}`] = {}; for (let s = 1; s <= 4; s++) { f_appData[`${d}_${t}`][s] = Array(4).fill(null).map(() => ({name: "未設定", qty: 0, span: 1})); } }); });
-    }
+    if (!f_appData) { f_appData = {}; ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { f_appData[`${d}_${t}`] = {}; for (let s = 1; s <= 4; s++) { f_appData[`${d}_${t}`][s] = Array(4).fill(null).map(() => ({name: "未設定", qty: 0, span: 1})); } }); }); }
 
     function f_renderAll() { for(let s=1; s<=4; s++) f_renderShelf(s); }
-    function f_renderShelf(shelfNum) {
-        const body = document.querySelector(`#f-shelf-${shelfNum} .shelf-body`);
-        body.innerHTML = '';
-        const slots = f_appData[`${globalDay}_${globalTime}`][shelfNum];
+    function f_renderShelf(sNum) {
+        const body = document.querySelector(`#f-shelf-${sNum} .shelf-body`); body.innerHTML = ''; const slots = f_appData[`${globalDay}_${globalTime}`][sNum];
         for (let i = 0; i < 4; i++) {
-            const data = slots[i]; if (!data) continue;
-            const isExp = data.span === 2;
+            const data = slots[i]; if (!data) continue; const isExp = data.span === 2;
             const slotEl = document.createElement('div'); slotEl.className = `slot ${isExp ? 'expanded' : ''}`;
             const opts = f_productMaster.map(p => `<option value="${p.name}" ${p.name===data.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts = ''; for(let q=0; q<=20; q++) qtyOpts += `<option value="${q}" ${data.qty===q?'selected':''}>${q}</option>`;
-            let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${shelfNum}, ${i})">>< 1F戻す</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${shelfNum}, ${i})">◀▶ 2F展開</button>` : '');
-            slotEl.innerHTML = `<div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div><select onchange="f_update(${shelfNum}, ${i}, 'name', this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="f_update(${shelfNum}, ${i}, 'qty', this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
+            let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">>< 1F戻す</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">◀▶ 2F展開</button>` : '');
+            slotEl.innerHTML = `<div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div><select onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="f_update(${sNum}, ${i}, 'qty', this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
             body.appendChild(slotEl); if(isExp) i++;
         }
     }
-    function f_update(sNum, sIdx, field, val) { if(field==='qty') val=parseInt(val)||0; f_appData[`${globalDay}_${globalTime}`][sNum][sIdx][field]=val; localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); updateGrandTotal(); flashSaveIndicator(); }
-    function f_toggleSpan(sNum, sIdx) { const slots = f_appData[`${globalDay}_${globalTime}`][sNum]; if(slots[sIdx].span===1){ slots[sIdx].span=2; if(sIdx+1<4) slots[sIdx+1].span=1; } else { slots[sIdx].span=1; } localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); f_renderShelf(sNum); updateGrandTotal(); }
+    function f_update(s, i, f, v) { if(f==='qty') v=parseInt(v)||0; f_appData[`${globalDay}_${globalTime}`][s][i][f]=v; localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); updateGrandTotal(); flashSaveIndicator(); }
+    function f_toggleSpan(s, i) { const slots = f_appData[`${globalDay}_${globalTime}`][s]; if(slots[i].span===1){ slots[i].span=2; if(i+1<4) slots[i+1].span=1; } else { slots[i].span=1; } localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); f_renderShelf(s); updateGrandTotal(); }
     function f_toggleShelf(n) { const chk=document.getElementById(`f-check-${n}`).checked; document.getElementById(`f-shelf-${n}`).classList.toggle('hidden', chk); f_sysState.hidden[`${globalDay}_${globalTime}`][n]=chk; localStorage.setItem('sej_flyer_sys_v5', JSON.stringify(f_sysState)); }
     function f_updateHideUI() { for(let i=1; i<=4; i++){ const chk=f_sysState.hidden[`${globalDay}_${globalTime}`][i]; document.getElementById(`f-check-${i}`).checked=chk; document.getElementById(`f-shelf-${i}`).classList.toggle('hidden', chk); } }
     function f_calcSum() { let sum=0; const slots=f_appData[`${globalDay}_${globalTime}`]; for(let s=1; s<=4; s++){ for(let i=0; i<4; i++){ const d=slots[s][i]; const p=f_productMaster.find(x=>x.name===d.name); sum+=(p?p.price:0)*(d.qty||0); if(d.span===2) i++; } } return Math.floor(sum); }
 
     /* =========================================================
-       パン・常温用データ＆ロジック (b_ prefix) - 2フェイス展開対応
+       パン・常温用データ＆ロジック (2フェイス対応)
        ========================================================= */
-    let b_sysState = JSON.parse(localStorage.getItem('sej_bakery_sys_v1'));
-    if (!b_sysState || typeof b_sysState.hidden['weekday_morning'] === 'undefined') {
-        b_sysState = { unitCount: 1, hidden: {} };
-        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_sysState.hidden[`${d}_${t}`] = {1:{1:false,2:false,3:false,4:false}, 2:{1:false,2:false,3:false,4:false}}; }); });
-    }
+    let b_sysState = JSON.parse(localStorage.getItem('sej_bakery_sys_v1')) || { unitCount: 1, hidden: {} };
+    if (!b_sysState.hidden['weekday_morning']) { ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_sysState.hidden[`${d}_${t}`] = {1:{1:false,2:false,3:false,4:false}, 2:{1:false,2:false,3:false,4:false}}; }); }); }
     const b_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ふんわりメロンパン", price: 160.92 }, { name: "チョコクッキー", price: 200.88 }, { name: "ソーセージフランス", price: 250.56 }, { name: "たい焼き", price: 190.08 }];
     let b_productMaster = JSON.parse(localStorage.getItem('sej_bakery_master_v1')) || [...b_defaultMaster];
     let b_appData = JSON.parse(localStorage.getItem('sej_bakery_data_v1'));
-    if (!b_appData) {
-        b_appData = {};
-        ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_appData[`${d}_${t}`] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[`${d}_${t}`][u][s] = [{name:"未設定",qty:0, span: 1}, {name:"未設定",qty:0, span: 1}]; } }); });
-    }
+    if (!b_appData) { b_appData = {}; ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { b_appData[`${d}_${t}`] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[`${d}_${t}`][u][s] = [{name:"未設定",qty:0,span:1}, {name:"未設定",qty:0,span:1}]; } }); }); }
 
     function b_buildDOM(u) {
         const c=document.getElementById(`b-shelves-container-${u}`); c.innerHTML='';
-        for(let s=1; s<=4; s++){
-            c.innerHTML += `<div class="shelf" id="b-shelf-${u}-${s}"><div class="shelf-header"><span>${s}段目</span><label class="hide-label"><input type="checkbox" id="b-check-${u}-${s}" onchange="b_toggleShelf(${u},${s})"> 目隠し</label></div><div class="shelf-body" id="b-shelf-body-${u}-${s}"></div></div>`;
-        }
+        for(let s=1; s<=4; s++){ c.innerHTML += `<div class="shelf" id="b-shelf-${u}-${s}"><div class="shelf-header"><span>${s}段目</span><label class="hide-label"><input type="checkbox" id="b-check-${u}-${s}" onchange="b_toggleShelf(${u},${s})"> 目隠し</label></div><div class="shelf-body" id="b-shelf-body-${u}-${s}"></div></div>`; }
     }
     function b_renderAll() { for(let u=1; u<=b_sysState.unitCount; u++){ for(let s=1; s<=4; s++) b_renderShelf(u, s); } }
     function b_renderShelf(u, s) {
-        const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML='';
-        const slots=b_appData[`${globalDay}_${globalTime}`][u][s];
+        const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML=''; const slots=b_appData[`${globalDay}_${globalTime}`][u][s];
         for(let i=0; i<2; i++){
-            const d=slots[i]; 
-            const isExp = d.span === 2;
-            const slotEl=document.createElement('div'); slotEl.className=`slot ${isExp ? 'expanded' : ''}`;
+            const d=slots[i]; const isExp=d.span===2; const slotEl=document.createElement('div'); slotEl.className=`slot ${isExp?'expanded':''}`;
             const opts=b_productMaster.map(p=>`<option value="${p.name}" ${p.name===d.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts=''; for(let q=0; q<=20; q++) qtyOpts+=`<option value="${q}" ${d.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">>< 1F戻す</button>` : (i===0 ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">◀▶ 2F展開</button>` : '');
-            slotEl.innerHTML=`<div class="slot-header"><span>${isExp ? '2フェイス展開' : (i===0?'左フェイス':'右フェイス')}</span>${btn}</div><select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
-            body.appendChild(slotEl);
-            if(isExp) i++;
+            slotEl.innerHTML=`<div class="slot-header"><span>${isExp?'2フェイス展開':(i===0?'左フェイス':'右フェイス')}</span>${btn}</div><select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
+            body.appendChild(slotEl); if(isExp) i++;
         }
     }
     function b_update(u, s, i, f, v) { if(f==='qty') v=parseInt(v)||0; b_appData[`${globalDay}_${globalTime}`][u][s][i][f]=v; localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); updateGrandTotal(); flashSaveIndicator(); }
-    
-    // パン用 2F展開切り替え
-    function b_toggleSpan(u, s, i) { 
-        const slots = b_appData[`${globalDay}_${globalTime}`][u][s]; 
-        if(!slots[i].span || slots[i].span === 1){ 
-            slots[i].span = 2; 
-            if(i+1 < 2) slots[i+1].span = 1; 
-        } else { 
-            slots[i].span = 1; 
-        } 
-        localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); 
-        b_renderShelf(u, s); updateGrandTotal(); flashSaveIndicator();
-    }
-
+    function b_toggleSpan(u, s, i) { const slots=b_appData[`${globalDay}_${globalTime}`][u][s]; if(!slots[i].span||slots[i].span===1){ slots[i].span=2; if(i+1<2) slots[i+1].span=1; } else { slots[i].span=1; } localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); b_renderShelf(u, s); updateGrandTotal(); flashSaveIndicator(); }
     function b_toggleShelf(u, s) { const chk=document.getElementById(`b-check-${u}-${s}`).checked; document.getElementById(`b-shelf-${u}-${s}`).classList.toggle('hidden', chk); b_sysState.hidden[`${globalDay}_${globalTime}`][u][s]=chk; localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); }
     function b_updateHideUI() { for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++){ const el=document.getElementById(`b-check-${u}-${s}`); if(!el)continue; const chk=b_sysState.hidden[`${globalDay}_${globalTime}`][u][s]; el.checked=chk; document.getElementById(`b-shelf-${u}-${s}`).classList.toggle('hidden',chk); } } }
     function b_setUnitCount(num) { b_sysState.unitCount=num; localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); document.getElementById('btn-unit-1').classList.toggle('active',num===1); document.getElementById('btn-unit-2').classList.toggle('active',num===2); document.getElementById('unit-section-2').style.display=num===2?'block':'none'; b_renderAll(); updateGrandTotal(); }
@@ -383,76 +315,37 @@
        ========================================================= */
     function switchTab(tab) {
         currentTab = tab; savePrefs();
-        document.getElementById('tab-fryer').classList.toggle('active', tab==='fryer');
-        document.getElementById('tab-bakery').classList.toggle('active', tab==='bakery');
-        document.getElementById('view-fryer').style.display = tab==='fryer' ? 'block' : 'none';
-        document.getElementById('view-bakery').style.display = tab==='bakery' ? 'block' : 'none';
-        
-        const mainColor = tab==='fryer' ? 'var(--711-orange)' : 'var(--bakery-orange)';
-        document.getElementById('btn-print').style.background = mainColor;
+        document.getElementById('tab-fryer').classList.toggle('active', tab==='fryer'); document.getElementById('tab-bakery').classList.toggle('active', tab==='bakery');
+        document.getElementById('view-fryer').style.display = tab==='fryer' ? 'block' : 'none'; document.getElementById('view-bakery').style.display = tab==='bakery' ? 'block' : 'none';
+        document.getElementById('btn-print').style.background = tab==='fryer' ? 'var(--711-orange)' : 'var(--bakery-orange)';
         document.getElementById('app-subtitle').textContent = tab==='fryer' ? 'フライヤー仕込み表' : '常温什器（焼成パン）仕込み表';
         updateGrandTotal();
     }
-
     function setGlobalDay(day) { globalDay=day; savePrefs(); document.getElementById('btn-weekday').classList.toggle('active', day==='weekday'); document.getElementById('btn-holiday').classList.toggle('active', day==='holiday'); f_updateHideUI(); b_updateHideUI(); f_renderAll(); b_renderAll(); updateGrandTotal(); }
     function setGlobalTime(time) { globalTime=time; savePrefs(); ['morning','noon','night'].forEach(t=>document.getElementById(`btn-${t}`).classList.toggle('active', time===t)); f_updateHideUI(); b_updateHideUI(); f_renderAll(); b_renderAll(); updateGrandTotal(); }
     function updateGrandTotal() { const sum = currentTab === 'fryer' ? f_calcSum() : b_calcSum(); document.getElementById('grand-total').textContent = `売価合計: ¥${sum.toLocaleString()}`; }
 
-    /* =========================================================
-       マスター＆コピー処理 (アクティブタブで分岐)
-       ========================================================= */
-    function openMaster() {
-        const title = currentTab === 'fryer' ? 'フライヤー商品更新' : 'パン商品更新';
-        document.getElementById('master-modal-title').textContent = title;
-        const master = currentTab === 'fryer' ? f_productMaster : b_productMaster;
-        document.getElementById('master-input').value = master.map(p => `${p.name}\n${p.price}`).join('\n');
-        document.getElementById('master-modal').style.display='block';
-    }
+    function openMaster() { document.getElementById('master-modal-title').textContent = currentTab === 'fryer' ? 'フライヤー商品更新' : 'パン商品更新'; document.getElementById('master-input').value = (currentTab === 'fryer' ? f_productMaster : b_productMaster).map(p => `${p.name}\n${p.price}`).join('\n'); document.getElementById('master-modal').style.display='block'; }
     function closeMaster() { document.getElementById('master-modal').style.display='none'; }
-    function resetMaster() {
-        if(confirm("初期状態に戻しますか？")) {
-            if(currentTab==='fryer') { f_productMaster = [...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); }
-            else { b_productMaster = [...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); }
-            closeMaster(); flashSaveIndicator(); updateGrandTotal();
-        }
-    }
-    function saveMaster() {
-        const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }];
-        for(let i=0; i<lines.length; i+=2) { const n=lines[i]?lines[i].trim():''; const p=lines[i+1]?lines[i+1].match(/[\d.]+/):null; if(n&&n!=="未設定") newList.push({name:n, price:p?parseFloat(p[0]):0}); }
-        if(currentTab==='fryer') { f_productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); }
-        else { b_productMaster = newList; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); }
-        closeMaster(); updateGrandTotal(); flashSaveIndicator();
-    }
+    function resetMaster() { if(confirm("初期状態に戻しますか？")) { if(currentTab==='fryer') { f_productMaster=[...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster=[...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); flashSaveIndicator(); updateGrandTotal(); } }
+    function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const n=lines[i]?lines[i].trim():''; const p=lines[i+1]?lines[i+1].match(/[\d.]+/):null; if(n&&n!=="未設定") newList.push({name:n, price:p?parseFloat(p[0]):0}); } if(currentTab==='fryer') { f_productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster = newList; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); updateGrandTotal(); flashSaveIndicator(); }
 
-    function openCopyModal() {
-        const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝';
-        document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在開いている「${currentTab==='fryer'?'フライヤー':'パン'}」のみ処理されます。`;
-        const c=document.getElementById('copy-btn-container'); c.innerHTML='';
-        ['morning','noon','night'].forEach(t=>{
-            if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); }
-        });
-        document.getElementById('copy-modal').style.display='block';
-    }
+    function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在開いている「${currentTab==='fryer'?'フライヤー':'パン'}」のみ処理されます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
     function closeCopyModal() { document.getElementById('copy-modal').style.display='none'; }
-    function executeCopy(srcTime) {
-        if(!confirm('上書きされます。よろしいですか？')) return;
-        const tk=`${globalDay}_${globalTime}`; const sk=`${globalDay}_${srcTime}`;
-        if(currentTab==='fryer') { f_appData[tk]=JSON.parse(JSON.stringify(f_appData[sk])); f_sysState.hidden[tk]=JSON.parse(JSON.stringify(f_sysState.hidden[sk])); localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); localStorage.setItem('sej_flyer_sys_v5', JSON.stringify(f_sysState)); f_updateHideUI(); f_renderAll(); }
-        else { b_appData[tk]=JSON.parse(JSON.stringify(b_appData[sk])); b_sysState.hidden[tk]=JSON.parse(JSON.stringify(b_sysState.hidden[sk])); localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); b_updateHideUI(); b_renderAll(); }
-        closeCopyModal(); updateGrandTotal(); flashSaveIndicator();
-    }
+    function executeCopy(srcTime) { if(!confirm('上書きされます。よろしいですか？')) return; const tk=`${globalDay}_${globalTime}`; const sk=`${globalDay}_${srcTime}`; if(currentTab==='fryer') { f_appData[tk]=JSON.parse(JSON.stringify(f_appData[sk])); f_sysState.hidden[tk]=JSON.parse(JSON.stringify(f_sysState.hidden[sk])); localStorage.setItem('sej_flyer_data_v5', JSON.stringify(f_appData)); localStorage.setItem('sej_flyer_sys_v5', JSON.stringify(f_sysState)); f_updateHideUI(); f_renderAll(); } else { b_appData[tk]=JSON.parse(JSON.stringify(b_appData[sk])); b_sysState.hidden[tk]=JSON.parse(JSON.stringify(b_sysState.hidden[sk])); localStorage.setItem('sej_bakery_data_v1', JSON.stringify(b_appData)); localStorage.setItem('sej_bakery_sys_v1', JSON.stringify(b_sysState)); b_updateHideUI(); b_renderAll(); } closeCopyModal(); updateGrandTotal(); flashSaveIndicator(); }
+
+    function closeImageModal() { document.getElementById('image-modal').style.display='none'; }
 
     /* =========================================================
-       一括印刷処理 (アクティブタブでHTML生成分岐)
+       共通HTMLビルダ (印刷＆画像保存の両方で使います)
        ========================================================= */
-    function executePrint() {
+    function buildPrintHTML() {
         const container = document.getElementById('print-container');
         const now = new Date(); const dStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 出力`;
         const times = [{id:'morning', label:'🌅 朝'}, {id:'noon', label:'☀️ 昼'}, {id:'night', label:'🌙 夜'}];
         const days = [{id:'weekday', label:'平日', class:'weekday'}, {id:'holiday', label:'土日祝', class:'holiday'}];
         let totalW=0, totalH=0;
 
-        // --- フライヤー版 印刷生成 ---
         if(currentTab === 'fryer') {
             times.forEach(t => { days.forEach(d => { let sum=0; for(let s=1; s<=4; s++){ if(!f_sysState.hidden[`${d.id}_${t.id}`][s]){ for(let i=0; i<4; i++){ const dt=f_appData[`${d.id}_${t.id}`][s][i]; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
             let html = `<div class="print-header mode-fryer"><div class="print-header-left"><div class="print-title"><span>フライヤー仕込み表</span></div><div class="print-warning">※そのままA4に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-fryer">`;
@@ -465,13 +358,10 @@
                     html += `<div class="${cls}"><div class="print-shelf-label">${s}段</div><div class="print-slots">`;
                     for(let i=0; i<4; i++){ const dt=slotsData[s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; if(dt.span===2) i++; }
                     html += `</div></div>`;
-                }
-                html += `</div>`;
+                } html += `</div>`;
             }); html += `</div>`; });
             html += '</div>'; container.innerHTML = html;
-        } 
-        // --- パン版 印刷生成 ---
-        else {
+        } else {
             const uCnt = b_sysState.unitCount;
             times.forEach(t => { days.forEach(d => { let sum=0; for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[`${d.id}_${t.id}`][u][s]){ for(let i=0; i<2; i++){ const dt=b_appData[`${d.id}_${t.id}`][u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
             let html = `<div class="print-header mode-bakery"><div class="print-header-left"><div class="print-title"><span>常温パン仕込み表</span><span class="print-title-sub">（${uCnt}台運用）</span></div><div class="print-warning">※そのままA4に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-bakery">`;
@@ -487,12 +377,56 @@
                         for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; const isExp = dt.span===2; html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; if(isExp) i++; }
                         html += `</div></div>`;
                     } html += `</div>`;
-                }
-                html += `</div></div>`;
+                } html += `</div></div>`;
             }); html += `</div>`; });
             html += '</div>'; container.innerHTML = html;
         }
+    }
+
+    /* =========================================================
+       アクションボタン処理 (印刷 / 画像保存)
+       ========================================================= */
+    function executePrint() {
+        buildPrintHTML();
         setTimeout(() => { window.print(); }, 200);
+    }
+
+    function executeImageSave() {
+        const btn = document.getElementById('btn-image-save');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ 処理中...';
+        
+        // 印刷用HTMLを構築し、強制的に画面上に表示させる（表示させないと画像化できないため）
+        buildPrintHTML();
+        document.body.classList.add('export-mode');
+        
+        // DOMが描画されるのを少し待ってから画像化処理
+        setTimeout(() => {
+            const wrapper = document.getElementById('print-wrapper');
+            // 高解像度（scale: 2）でCanvasに描画
+            html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                // 処理が終わったら元の画面に戻す
+                document.body.classList.remove('export-mode');
+                btn.innerHTML = originalText;
+                
+                // Canvasを画像(PNG)に変換
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                img.style.width = '100%';
+                img.style.height = 'auto';
+                
+                const resultContainer = document.getElementById('image-result-container');
+                resultContainer.innerHTML = '';
+                resultContainer.appendChild(img);
+                
+                // モーダルを表示
+                document.getElementById('image-modal').style.display = 'block';
+            }).catch(err => {
+                document.body.classList.remove('export-mode');
+                btn.innerHTML = originalText;
+                alert('画像の生成に失敗しました。');
+            });
+        }, 500); 
     }
 
     // 初期化実行
