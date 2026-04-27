@@ -140,7 +140,7 @@
         textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
 
         /* =========================================
-           プロ仕様・一括印刷専用スタイル（システム内蔵 80%縮小版）
+           プロ仕様・一括印刷専用スタイル（システム内蔵 85%縮小版）
            ========================================= */
         #print-wrapper { display: none; }
         
@@ -149,13 +149,11 @@
             body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", "Helvetica Neue", Arial, sans-serif; }
             .header, #app-container, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            /* 【魔法の縮小ラッパー 80%版】
-               A4用紙 (幅210mm×高さ297mm) に対して、枠をわざと大きく作り、それを80%に縮小してA4にピッタリはめる */
             #print-wrapper {
                 display: block !important;
-                width: 262mm;   /* 210mm ÷ 0.80 = 262.5mm */
-                height: 371mm;  /* 297mm ÷ 0.80 = 371.25mm */
-                transform: scale(0.8);
+                width: 247mm;   
+                height: 349mm;  
+                transform: scale(0.85);
                 transform-origin: top left;
                 overflow: hidden;
             }
@@ -165,42 +163,42 @@
                 height: 100%; padding: 8mm; box-sizing: border-box; 
             }
             
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 4mm; padding-bottom: 2mm; flex-shrink: 0; }
-            .print-header-left { display: flex; flex-direction: column; gap: 4px; }
+            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 2mm; flex-shrink: 0; }
+            .print-header-left { display: flex; flex-direction: column; gap: 3px; }
             
             /* 印刷用タイトル（2段表記） */
-            .print-title { font-size: 24px; font-weight: 900; letter-spacing: 0.5px; color: #000; display: flex; align-items: baseline; gap: 10px; }
-            .print-title-sub { font-size: 13px; color: #555; font-weight: 700; letter-spacing: 0; }
+            .print-title { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; color: #000; display: flex; align-items: baseline; gap: 8px; }
+            .print-title-sub { font-size: 12px; color: #555; font-weight: 700; letter-spacing: 0; }
             
-            .print-warning { font-size: 13px; color: #ee0000; font-weight: bold; }
-            .print-date { font-size: 12px; color: #555; }
+            .print-warning { font-size: 12px; color: #ee0000; font-weight: bold; }
+            .print-date { font-size: 11px; color: #555; }
             
-            .print-daily-total { display: flex; flex-direction: column; gap: 3px; background: #f9f9f9; border: 1px solid #ccc; padding: 6px 12px; border-radius: 6px; text-align: right; }
-            .print-daily-total div { font-size: 14px; font-weight: bold; }
-            .print-daily-total span { font-size: 18px; color: #000; margin-left: 6px; }
+            .print-daily-total { display: flex; flex-direction: column; gap: 2px; background: #f9f9f9; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; text-align: right; }
+            .print-daily-total div { font-size: 13px; font-weight: bold; }
+            .print-daily-total span { font-size: 16px; color: #000; margin-left: 5px; }
 
-            .print-grid { display: flex; flex-direction: column; gap: 5mm; flex: 1; min-height: 0; overflow: hidden; }
-            .print-row { display: flex; flex-direction: row; gap: 5mm; flex: 1; min-height: 0; }
+            .print-grid { display: flex; flex-direction: column; gap: 4mm; flex: 1; min-height: 0; overflow: hidden; }
+            .print-row { display: flex; flex-direction: row; gap: 4mm; flex: 1; min-height: 0; }
             
             .print-block { flex: 1; border: 2px solid #000; display: grid; grid-template-rows: auto 1fr 1fr 1fr 1fr; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
             
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 5px 12px; color: #fff; font-weight: bold; font-size: 16px; border-bottom: 2px solid #000; height: 28px; }
+            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; color: #fff; font-weight: bold; font-size: 14px; border-bottom: 2px solid #000; height: 24px; }
             .print-block-title.weekday { background-color: var(--print-blue); }
             .print-block-title.holiday { background-color: var(--print-red); }
-            .print-block-total { font-size: 12px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 3px 10px; border-radius: 8px; }
+            .print-block-total { font-size: 11px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 8px; }
 
             .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
             .print-shelf:last-child { border-bottom: none; }
             
-            .print-shelf-label { width: 22px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; padding: 3px 0; color: #333; }
+            .print-shelf-label { width: 18px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; padding: 2px 0; color: #333; }
             
             .print-slots { display: flex; flex: 1; min-height: 0; }
-            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
+            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
             .print-slot:last-child { border-right: none; }
             
-            .print-name { font-size: 14px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 2px; color: #111; }
-            .print-qty { font-size: 28px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 3px; }
-            .print-qty.zero { color: #ccc; font-size: 16px; font-weight: normal; }
+            .print-name { font-size: 12px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
+            .print-qty { font-size: 24px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 2px; }
+            .print-qty.zero { color: #ccc; font-size: 14px; font-weight: normal; }
 
             .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-shelf.hidden-shelf * { visibility: hidden !important; }
