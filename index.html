@@ -100,11 +100,45 @@
 
         /* =========================================
            印刷・画像エクスポート 共通レイアウト
-           (画面には表示されず、バックグラウンドでのみ構築されます)
            ========================================= */
         #print-wrapper { display: none; }
-        #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm 6mm; box-sizing: border-box; background: white; }
-        .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 1mm; flex-shrink: 0; }
+        
+        /* [画像生成時の一時スタイル] */
+        .export-mode .header, .export-mode .main-tab-container, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
+        .export-mode #print-wrapper { display: block !important; width: 794px !important; height: 1050px !important; background: white; position: absolute; top: 0; left: 0; z-index: 9999; }
+        
+        /* =========================================
+           [最強の1枚ロック] 印刷用スタイル
+           ========================================= */
+        @media print {
+            @page { size: A4 portrait; margin: 0 !important; }
+            
+            /* body自体を画面100%に固定し、はみ出し（スクロール・2枚目）を強制カット */
+            html, body { 
+                width: 100%; height: 100% !important; 
+                margin: 0 !important; padding: 0 !important; 
+                overflow: hidden !important; 
+                background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif;
+            }
+            
+            /* 入力画面関係は全て非表示 */
+            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
+            
+            /* print-wrapperを絶対配置で上下左右にピン留め。これで絶対に1枚サイズからブレません */
+            #print-wrapper { 
+                display: block !important; 
+                position: absolute !important;
+                top: 0; left: 0; right: 0; bottom: 0;
+                width: 100%; height: 100%;
+                overflow: hidden !important;
+                page-break-after: avoid; 
+                page-break-inside: avoid;
+            }
+        }
+
+        /* 以下、印刷時＆画像化時 共通の表デザイン（フレックスで均等に伸びる設定） */
+        #print-container { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 4mm 6mm; box-sizing: border-box; background: white; }
+        .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
         .print-header-left { display: flex; flex-direction: column; gap: 2px; }
         .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
         .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
@@ -113,10 +147,12 @@
         .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
         .print-daily-total div { font-size: 11px; font-weight: bold; }
         .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
-        .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
-        .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
+        
+        /* 表全体が画面の最後まで「flex: 1」で隙間なく均等に引き伸ばされる */
+        .print-grid { display: flex; flex-direction: column; gap: 2.5mm; flex: 1; min-height: 0; overflow: hidden; }
+        .print-row { display: flex; flex-direction: row; gap: 2.5mm; flex: 1; min-height: 0; }
         .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
-        .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; flex-shrink: 0;}
+        .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 18px; flex-shrink: 0;}
         .print-block-title.weekday { background-color: var(--print-blue); }
         .print-block-title.holiday { background-color: var(--print-red); }
         .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
@@ -125,6 +161,7 @@
         .print-unit-col:last-child { border-right: none; }
         .print-unit-header { font-size: 10px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 2px 0; display: none; flex-shrink: 0;}
         .two-units .print-unit-header { display: block; }
+        
         .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
         .print-block > .print-shelf:last-child, .print-unit-col > .print-shelf:last-child { border-bottom: none; }
         .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
@@ -132,23 +169,12 @@
         .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
         .print-slot:last-child { border-right: none; }
         .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
-        .print-qty { font-size: 20px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
-        .mode-bakery .print-qty { font-size: 22px; } 
+        .print-qty { font-size: 19px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
+        .mode-bakery .print-qty { font-size: 21px; } 
         .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
         .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .print-shelf.hidden-shelf * { visibility: hidden !important; }
 
-        /* [画像生成時の一時スタイル] */
-        .export-mode .header, .export-mode .main-tab-container, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
-        .export-mode #print-wrapper { display: block !important; width: 794px !important; height: 1050px !important; background: white; position: absolute; top: 0; left: 0; z-index: 9999; }
-        
-        /* [紙印刷用スタイル] */
-        @media print {
-            @page { size: A4 portrait; margin: 0 !important; }
-            html, body { height: 100%; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif; }
-            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
-            #print-wrapper { display: block !important; width: 100%; height: 250mm; overflow: hidden; margin: 0 auto; }
-        }
     </style>
 </head>
 <body>
@@ -396,20 +422,15 @@
         const originalText = btn.innerHTML;
         btn.innerHTML = '⏳ 処理中...';
         
-        // 印刷用HTMLを構築し、強制的に画面上に表示させる（表示させないと画像化できないため）
         buildPrintHTML();
         document.body.classList.add('export-mode');
         
-        // DOMが描画されるのを少し待ってから画像化処理
         setTimeout(() => {
             const wrapper = document.getElementById('print-wrapper');
-            // 高解像度（scale: 2）でCanvasに描画
             html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-                // 処理が終わったら元の画面に戻す
                 document.body.classList.remove('export-mode');
                 btn.innerHTML = originalText;
                 
-                // Canvasを画像(PNG)に変換
                 const img = document.createElement('img');
                 img.src = canvas.toDataURL('image/png');
                 img.style.width = '100%';
@@ -419,7 +440,6 @@
                 resultContainer.innerHTML = '';
                 resultContainer.appendChild(img);
                 
-                // モーダルを表示
                 document.getElementById('image-modal').style.display = 'block';
             }).catch(err => {
                 document.body.classList.remove('export-mode');
