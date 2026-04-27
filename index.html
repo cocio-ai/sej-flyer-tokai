@@ -40,7 +40,7 @@
         .save-status { font-size: 9px; color: var(--711-green); font-weight: 800; opacity: 0.5; transition: opacity 0.3s; }
         .total-display { font-size: 22px; font-weight: 900; color: var(--711-red); letter-spacing: -0.5px; }
 
-        /* タブ切り替え（統合版の要） */
+        /* タブ切り替え */
         .main-tab-container { display: flex; background: #e5e5ea; border-radius: 12px; padding: 4px; margin-bottom: 16px; }
         .main-tab-btn { flex: 1; border: none; padding: 12px 8px; border-radius: 8px; font-size: 15px; font-weight: 800; background: transparent; color: var(--text-sub); transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px;}
         .main-tab-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -95,60 +95,62 @@
         textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
 
         /* =========================================
-           一括印刷専用スタイル（95%・230mm安全圏）
-           ※フライヤー/パン両対応の共通設計
+           一括印刷専用スタイル
            ========================================= */
         #print-wrapper { display: none; }
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             html, body { height: 100%; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif; }
             
-            /* 【修正点】入力画面の view-fryer と view-bakery も印刷時に隠すよう追加しました */
+            /* 入力画面関係は全て非表示 */
             .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal { display: none !important; }
             
-            #print-wrapper { display: block !important; width: 100%; height: 230mm; max-height: 230mm; overflow: hidden; }
-            #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm; box-sizing: border-box; }
+            /* iPadの余白を避けつつ、自然に用紙を埋める安全な高さ(275mm)に変更 */
+            #print-wrapper { display: block !important; width: 100%; height: 275mm; max-height: 275mm; overflow: hidden; margin: 0 auto; }
+            #print-container { display: flex; flex-direction: column; height: 100%; padding: 4mm 6mm; box-sizing: border-box; }
             
-            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
+            .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 3mm; padding-bottom: 1mm; flex-shrink: 0; }
             .print-header-left { display: flex; flex-direction: column; gap: 2px; }
-            .print-title { font-size: 17px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
-            .print-title-sub { font-size: 10px; color: #555; font-weight: 700; }
+            .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
+            .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
             .print-warning { font-size: 10px; color: #555; font-weight: bold; }
-            .print-date { font-size: 9px; color: #555; }
+            .print-date { font-size: 10px; color: #555; }
             
             .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
-            .print-daily-total div { font-size: 10px; font-weight: bold; }
-            .print-daily-total span { font-size: 13px; color: #000; margin-left: 3px; }
+            .print-daily-total div { font-size: 11px; font-weight: bold; }
+            .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
 
-            .print-grid { display: flex; flex-direction: column; gap: 2mm; flex: 1; min-height: 0; overflow: hidden; }
-            .print-row { display: flex; flex-direction: row; gap: 2mm; flex: 1; min-height: 0; }
+            /* グリッド全体と行を「flex: 1」で隙間なく均等に引き伸ばす */
+            .print-grid { display: flex; flex-direction: column; gap: 3mm; flex: 1; min-height: 0; overflow: hidden; }
+            .print-row { display: flex; flex-direction: row; gap: 3mm; flex: 1; min-height: 0; }
             
             .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
-            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 11px; border-bottom: 2px solid #000; height: 18px; flex-shrink: 0;}
+            .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 20px; flex-shrink: 0;}
             .print-block-title.weekday { background-color: var(--print-blue); }
             .print-block-title.holiday { background-color: var(--print-red); }
-            .print-block-total { font-size: 9px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
+            .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
 
-            /* Bakery用の台数レイアウト（フライヤー時は無視される） */
+            /* Bakery用の台数レイアウト */
             .print-units-container { display: flex; flex-direction: row; flex: 1; min-height: 0; }
-            .print-unit-col { flex: 1; display: grid; grid-template-rows: repeat(4, 1fr); border-right: 2px solid #000; }
+            .print-unit-col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #000; }
             .print-unit-col:last-child { border-right: none; }
-            .print-unit-header { font-size: 9px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 1px 0; display: none; }
+            .print-unit-header { font-size: 10px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 2px 0; display: none; flex-shrink: 0;}
             .two-units .print-unit-header { display: block; }
             
-            .print-shelf { display: flex; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
-            .print-unit-col .print-shelf:last-child { border-bottom: none; }
-            .print-shelf-label { width: 14px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
+            /* 各段（shelf）を均等に上下に伸ばすために「flex: 1」を再設定 */
+            .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
+            .print-block > .print-shelf:last-child, .print-unit-col > .print-shelf:last-child { border-bottom: none; }
+            .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
             
+            /* マス目（slot）も均等に伸ばす */
             .print-slots { display: flex; flex: 1; min-height: 0; }
-            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
+            .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
             .print-slot:last-child { border-right: none; }
             
-            /* フライヤーとパンで少し文字サイズを変える */
-            .print-name { font-size: 10px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
-            .print-qty { font-size: 18px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
-            .mode-bakery .print-qty { font-size: 20px; } /* パンは枠が大きいので少し文字デカめ */
-            .print-qty.zero { color: #ccc; font-size: 11px; font-weight: normal; }
+            .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
+            .print-qty { font-size: 20px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
+            .mode-bakery .print-qty { font-size: 22px; } 
+            .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
 
             .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-shelf.hidden-shelf * { visibility: hidden !important; }
