@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Store Planner - セブン仕込み統合ツール</title>
+    
+    <meta property="og:title" content="Smart Store Planner - セブン仕込み統合ツール">
+    <meta property="og:description" content="フライヤー・常温パンの仕込み表をカンタン作成・印刷・画像保存できるツールです。">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Smart Store Planner">
+
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -87,7 +93,7 @@
         .btn { flex: 1; border: none; padding: 12px 4px; border-radius: 12px; font-size: 14px; font-weight: 700; background: #f0f0f2; color: var(--text-sub); transition: all 0.2s ease; }
         .btn.active { background: var(--711-green); color: #fff; box-shadow: 0 4px 10px rgba(0, 128, 96, 0.2); }
         
-        /* アクションボタン（2列レイアウトに変更） */
+        /* アクションボタン */
         .action-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .btn-sub, .btn-main { width: 100%; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; padding: 14px 4px; }
         .btn-sub { background: #3a3a3c; color: #fff; }
@@ -112,19 +118,13 @@
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
-            
-            /* body自体を画面100%に固定し、はみ出し（スクロール・2枚目）を強制カット */
             html, body { 
                 width: 100%; height: 100% !important; 
                 margin: 0 !important; padding: 0 !important; 
                 overflow: hidden !important; 
                 background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif;
             }
-            
-            /* 入力画面関係は全て非表示 */
             .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
-            
-            /* print-wrapperを絶対配置で上下左右にピン留め。これで絶対に1枚サイズからブレません */
             #print-wrapper { 
                 display: block !important; 
                 position: absolute !important;
@@ -136,7 +136,7 @@
             }
         }
 
-        /* 以下、印刷時＆画像化時 共通の表デザイン（フレックスで均等に伸びる設定） */
+        /* 印刷時＆画像化時 共通の表デザイン */
         #print-container { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 4mm 6mm; box-sizing: border-box; background: white; }
         .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
         .print-header-left { display: flex; flex-direction: column; gap: 2px; }
@@ -148,7 +148,6 @@
         .print-daily-total div { font-size: 11px; font-weight: bold; }
         .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
         
-        /* 表全体が画面の最後まで「flex: 1」で隙間なく均等に引き伸ばされる */
         .print-grid { display: flex; flex-direction: column; gap: 2.5mm; flex: 1; min-height: 0; overflow: hidden; }
         .print-row { display: flex; flex-direction: row; gap: 2.5mm; flex: 1; min-height: 0; }
         .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
