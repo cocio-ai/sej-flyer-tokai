@@ -79,6 +79,10 @@
         .qty-select { flex: 1; min-width: 0; padding: 6px; font-size: 18px; text-align: center; text-align-last: center; font-weight: 800; border: none; border-radius: 8px; height: 38px; background: #e5e5ea; color: var(--text-main); }
         .qty-unit { font-size: 12px; font-weight: 700; color: var(--text-sub); }
 
+        /* 波型什器のUIラベル */
+        .wave-label { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--text-sub); cursor: pointer; margin-top: 2px; background: #fff; padding: 4px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.03); }
+        .wave-label input { margin: 0; transform: scale(1.0); }
+
         /* Bakery 専用微調整 */
         #view-bakery .slot { background: #fdfcfb; border-color: #f0ece9; padding: 10px; gap: 8px;}
         #view-bakery .slot-header { font-size: 11px; font-weight: 800; }
@@ -253,7 +257,7 @@
 <div id="image-modal">
     <h3 style="margin-top:0;">ネットプリント用画像</h3>
     <p style="font-size: 13px; color: var(--711-red); font-weight: bold; background: #ffeeee; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
-        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存」をタップしてください。
+        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存}$をタップしてください。
     </p>
     <div id="image-result-container" style="text-align:center; overflow-y:auto; max-height:55vh; border:2px solid var(--border-color); border-radius: 8px; background:#fff; padding: 4px;"></div>
     <button class="btn-sub" style="width:100%; margin-top: 16px; padding: 14px;" onclick="closeImageModal()">閉じる</button>
@@ -283,24 +287,7 @@
         localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState));
     }
     
-    // 【更新】フライヤーの最新デフォルトラインナップ
-    const f_defaultMaster = [
-        { name: "未設定", price: 0 },
-        { name: "ななチキ", price: 250.56 },
-        { name: "ザクチキ", price: 250.56 },
-        { name: "揚げ鶏", price: 250.56 },
-        { name: "BIGポークフランク", price: 213.84 },
-        { name: "からあげ棒", price: 198.72 },
-        { name: "アメリカンドッグ", price: 150.12 },
-        { name: "牛肉コロッケ", price: 108.00 },
-        { name: "牛肉コロッケ（塩胡椒）", price: 128.52 },
-        { name: "五目春巻", price: 129.60 },
-        { name: "ハッシュポテト", price: 120.96 },
-        { name: "ささみ揚げ", price: 190.08 },
-        { name: "揚げたこ焼き（6個）", price: 427.68 },
-        { name: "揚げたこ焼き（3個）", price: 213.84 },
-        { name: "サクッとチキン（ピザ）", price: 180.36 }
-    ];
+    const f_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ななチキ", price: 250.56 }, { name: "ザクチキ", price: 250.56 }, { name: "揚げ鶏", price: 250.56 }, { name: "BIGポークフランク", price: 213.84 }, { name: "からあげ棒", price: 198.72 }, { name: "アメリカンドッグ", price: 150.12 }, { name: "牛肉コロッケ", price: 108.00 }, { name: "牛肉コロッケ（塩胡椒）", price: 128.52 }, { name: "五目春巻", price: 129.60 }, { name: "ハッシュポテト", price: 120.96 }, { name: "ささみ揚げ", price: 190.08 }, { name: "揚げたこ焼き（6個）", price: 427.68 }, { name: "揚げたこ焼き（3個）", price: 213.84 }, { name: "サクッとチキン（ピザ）", price: 180.36 }];
     let f_productMaster = JSON.parse(localStorage.getItem('sej_flyer_master_v5')) || [...f_defaultMaster];
     
     let f_appData = JSON.parse(localStorage.getItem('sej_flyer_data_v6'));
@@ -309,7 +296,7 @@
         ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { ['normal', 'rainy'].forEach(w => {
             const newKey = `${d}_${t}_${w}`; const oldKey = `${d}_${t}`;
             if(w === 'normal' && oldData[oldKey]) { f_appData[newKey] = oldData[oldKey]; }
-            else { f_appData[newKey] = {}; for (let s = 1; s <= 4; s++) { f_appData[newKey][s] = Array(4).fill(null).map(() => ({name: "未設定", qty: 0, span: 1})); } }
+            else { f_appData[newKey] = {}; for (let s = 1; s <= 4; s++) { f_appData[newKey][s] = Array(4).fill(null).map(() => ({name: "未設定", qty: 0, span: 1, wave: false})); } }
         }); }); });
         localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData));
     }
@@ -324,7 +311,19 @@
             const opts = f_productMaster.map(p => `<option value="${p.name}" ${p.name===data.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts = ''; for(let q=0; q<=20; q++) qtyOpts += `<option value="${q}" ${data.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">>< 1F戻す</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">◀▶ 2F展開</button>` : '');
-            slotEl.innerHTML = `<div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div><select onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="f_update(${sNum}, ${i}, 'qty', this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
+            
+            // 波型什器のチェックボックスを組み込み
+            slotEl.innerHTML = `
+                <div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div>
+                <select onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select>
+                <div class="qty-row">
+                    <select class="qty-select" onchange="f_update(${sNum}, ${i}, 'qty', this.value)">${qtyOpts}</select>
+                    <span class="qty-unit">個</span>
+                </div>
+                <label class="wave-label">
+                    <input type="checkbox" ${data.wave ? 'checked' : ''} onchange="f_update(${sNum}, ${i}, 'wave', this.checked)"> 🌊 波型
+                </label>
+            `;
             body.appendChild(slotEl); if(isExp) i++;
         }
     }
@@ -347,20 +346,7 @@
         localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState));
     }
     
-    // 【更新】常温パンの最新デフォルトラインナップ
-    const b_defaultMaster = [
-        { name: "未設定", price: 0 },
-        { name: "ふんわりメロンパン", price: 160.92 },
-        { name: "カリッじゅワッサン", price: 230.04 },
-        { name: "サクサククロワッサン", price: 190.08 },
-        { name: "チョコクロワッサン", price: 210.60 },
-        { name: "フィナンシェ", price: 160.92 },
-        { name: "チョコクッキー", price: 200.88 },
-        { name: "ソーセージフランス", price: 250.56 },
-        { name: "明太子フランス", price: 250.56 },
-        { name: "たい焼き", price: 190.08 },
-        { name: "お店で揚げたカレーパン", price: 160.92 }
-    ];
+    const b_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ふんわりメロンパン", price: 160.92 }, { name: "カリッじゅワッサン", price: 230.04 }, { name: "サクサククロワッサン", price: 190.08 }, { name: "チョコクロワッサン", price: 210.60 }, { name: "フィナンシェ", price: 160.92 }, { name: "チョコクッキー", price: 200.88 }, { name: "ソーセージフランス", price: 250.56 }, { name: "明太子フランス", price: 250.56 }, { name: "たい焼き", price: 190.08 }, { name: "お店で揚げたカレーパン", price: 160.92 }];
     let b_productMaster = JSON.parse(localStorage.getItem('sej_bakery_master_v1')) || [...b_defaultMaster];
     
     let b_appData = JSON.parse(localStorage.getItem('sej_bakery_data_v2'));
@@ -369,7 +355,7 @@
         ['weekday', 'holiday'].forEach(d => { ['morning', 'noon', 'night'].forEach(t => { ['normal', 'rainy'].forEach(w => {
             const newKey = `${d}_${t}_${w}`; const oldKey = `${d}_${t}`;
             if(w === 'normal' && oldData[oldKey]) { b_appData[newKey] = oldData[oldKey]; }
-            else { b_appData[newKey] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[newKey][u][s] = [{name:"未設定",qty:0,span:1}, {name:"未設定",qty:0,span:1}]; } }
+            else { b_appData[newKey] = {1:{}, 2:{}}; for(let u=1; u<=2; u++){ for(let s=1; s<=4; s++) b_appData[newKey][u][s] = [{name:"未設定",qty:0,span:1,wave:false}, {name:"未設定",qty:0,span:1,wave:false}]; } }
         }); }); });
         localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData));
     }
@@ -380,14 +366,25 @@
     }
     function b_renderAll() { for(let u=1; u<=b_sysState.unitCount; u++){ for(let s=1; s<=4; s++) b_renderShelf(u, s); } }
     function b_renderShelf(u, s) {
-        const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML=''; 
-        const slots=b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s];
+        const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML=''; const slots=b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s];
         for(let i=0; i<2; i++){
             const d=slots[i]; if(!d) continue; const isExp=d.span===2; const slotEl=document.createElement('div'); slotEl.className=`slot ${isExp?'expanded':''}`;
             const opts=b_productMaster.map(p=>`<option value="${p.name}" ${p.name===d.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts=''; for(let q=0; q<=20; q++) qtyOpts+=`<option value="${q}" ${d.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">>< 1F戻す</button>` : (i===0 ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">◀▶ 2F展開</button>` : '');
-            slotEl.innerHTML=`<div class="slot-header"><span>${isExp?'2フェイス展開':(i===0?'左フェイス':'右フェイス')}</span>${btn}</div><select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select><div class="qty-row"><select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select><span class="qty-unit">個</span></div>`;
+            
+            // 波型什器のチェックボックスを組み込み
+            slotEl.innerHTML=`
+                <div class="slot-header"><span>${isExp?'2フェイス展開':(i===0?'左フェイス':'右フェイス')}</span>${btn}</div>
+                <select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select>
+                <div class="qty-row">
+                    <select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select>
+                    <span class="qty-unit">個</span>
+                </div>
+                <label class="wave-label">
+                    <input type="checkbox" ${d.wave ? 'checked' : ''} onchange="b_update(${u},${s},${i}, 'wave', this.checked)"> 🌊 波型
+                </label>
+            `;
             body.appendChild(slotEl); if(isExp) i++;
         }
     }
@@ -417,25 +414,10 @@
     function openMaster() { document.getElementById('master-modal-title').textContent = currentTab === 'fryer' ? 'フライヤー商品更新' : 'パン商品更新'; document.getElementById('master-input').value = (currentTab === 'fryer' ? f_productMaster : b_productMaster).map(p => `${p.name}\n${p.price}`).join('\n'); document.getElementById('master-modal').style.display='block'; }
     function closeMaster() { document.getElementById('master-modal').style.display='none'; }
     function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const n=lines[i]?lines[i].trim():''; const p=lines[i+1]?lines[i+1].match(/[\d.]+/):null; if(n&&n!=="未設定") newList.push({name:n, price:p?parseFloat(p[0]):0}); } if(currentTab==='fryer') { f_productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster = newList; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); updateGrandTotal(); flashSaveIndicator(); }
-    
-    // 【更新】初期化ボタンを押した際に、新しいラインナップを呼び出す処理
-    function resetMaster() { 
-        if(confirm("初期状態に戻しますか？\n（※現在入力されている仕込みの数やレイアウトは消えません）")) { 
-            if(currentTab==='fryer') { 
-                f_productMaster=[...f_defaultMaster]; 
-                localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); 
-                f_renderAll(); 
-            } else { 
-                b_productMaster=[...b_defaultMaster]; 
-                localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); 
-                b_renderAll(); 
-            } 
-            closeMaster(); flashSaveIndicator(); updateGrandTotal(); 
-        } 
-    }
+    function resetMaster() { if(confirm("初期状態に戻しますか？\n（※現在入力されている仕込みの数やレイアウトは消えません）")) { if(currentTab==='fryer') { f_productMaster=[...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster=[...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); flashSaveIndicator(); updateGrandTotal(); } }
 
     function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; const wLbl=globalWeather==='normal'?'通常':'雨天'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${wLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在選択中の天気パターン内でのみコピーされます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
-    function closeCopyModal() { document.getElementById('copy-modal').style.display='none'; }
+    function closeCopyModal() { document.getElementById('copy-modal').style.none; }
     function executeCopy(srcTime) { if(!confirm('上書きされます。よろしいですか？')) return; const tk=`${globalDay}_${globalTime}_${globalWeather}`; const sk=`${globalDay}_${srcTime}_${globalWeather}`; if(currentTab==='fryer') { f_appData[tk]=JSON.parse(JSON.stringify(f_appData[sk])); f_sysState.hidden[tk]=JSON.parse(JSON.stringify(f_sysState.hidden[sk])); localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData)); localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState)); f_updateHideUI(); f_renderAll(); } else { b_appData[tk]=JSON.parse(JSON.stringify(b_appData[sk])); b_sysState.hidden[tk]=JSON.parse(JSON.stringify(b_sysState.hidden[sk])); localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData)); localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState)); b_updateHideUI(); b_renderAll(); } closeCopyModal(); updateGrandTotal(); flashSaveIndicator(); }
 
     function closeImageModal() { document.getElementById('image-modal').style.display='none'; }
@@ -454,7 +436,6 @@
         const titleSuffix = globalWeather === 'rainy' ? '（雨天用）' : '';
 
         if(currentTab === 'fryer') {
-            times.forEach(t => { days.forEach(d => { let sum=0; const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!f_sysState.hidden[key]){ for(let i=0; i<4; i++){ const dt=f_appData[key][s]?.[i] || f_appData[key][1][i]; if(!dt)continue; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } }); });
             times.forEach(t => { days.forEach(d => { let sum=0; for(let s=1; s<=4; s++){ const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!f_sysState.hidden[key][s]){ for(let i=0; i<4; i++){ const dt=f_appData[key][s][i]; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
 
             let html = `<div class="print-header mode-fryer"><div class="print-header-left"><div class="print-title"><span>フライヤー仕込み表 ${titleSuffix}</span></div><div class="print-warning">※A4サイズ1枚に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-fryer">`;
@@ -465,7 +446,14 @@
                 for(let s=1; s<=4; s++){
                     const cls = f_sysState.hidden[key][s] ? "print-shelf hidden-shelf" : "print-shelf";
                     html += `<div class="${cls}"><div class="print-shelf-label">${s}段</div><div class="print-slots">`;
-                    for(let i=0; i<4; i++){ const dt=slotsData[s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; if(dt.span===2) i++; }
+                    for(let i=0; i<4; i++){ 
+                        const dt=slotsData[s][i]; const q=dt.qty||0; 
+                        const nm=(dt.name==="未設定"||q===0)?"":dt.name; 
+                        // 波型チェックが入っていれば「（波型）」を付与
+                        const waveMark = (dt.wave && nm) ? " <span style='font-size:10px; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>" : "";
+                        html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
+                        if(dt.span===2) i++; 
+                    }
                     html += `</div></div>`;
                 } html += `</div>`;
             }); html += `</div>`; });
@@ -483,7 +471,14 @@
                     for(let s=1; s<=4; s++){
                         const cls = b_sysState.hidden[key][u][s] ? "print-shelf hidden-shelf" : "print-shelf";
                         html += `<div class="${cls}"><div class="print-shelf-label">${s}段</div><div class="print-slots">`;
-                        for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const q=dt.qty||0; const nm=(dt.name==="未設定"||q===0)?"":dt.name; const isExp = dt.span===2; html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name">${nm}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; if(isExp) i++; }
+                        for(let i=0; i<2; i++){ 
+                            const dt=slotsData[u][s][i]; const q=dt.qty||0; 
+                            const nm=(dt.name==="未設定"||q===0)?"":dt.name; const isExp = dt.span===2; 
+                            // 波型チェックが入っていれば「（波型）」を付与
+                            const waveMark = (dt.wave && nm) ? " <span style='font-size:10px; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>" : "";
+                            html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
+                            if(isExp) i++; 
+                        }
                         html += `</div></div>`;
                     } html += `</div>`;
                 } html += `</div></div>`;
