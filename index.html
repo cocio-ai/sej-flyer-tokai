@@ -113,7 +113,7 @@
            印刷・画像エクスポート 共通レイアウト
            ========================================= */
         #print-wrapper { display: none; }
-        .export-mode .header, .export-mode .main-tab-container, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
+        .export-mode .header, .export-mode .main-tab-container, .export-mode .legend-note, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
         .export-mode #print-wrapper { display: block !important; width: 794px !important; height: 1050px !important; background: white; position: absolute; top: 0; left: 0; z-index: 9999; }
         
         /* [最強の1枚ロック] 印刷用スタイル */
@@ -125,7 +125,7 @@
                 overflow: hidden !important; 
                 background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: "Hiragino Sans", Arial, sans-serif;
             }
-            .header, .main-tab-container, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
+            .header, .main-tab-container, .legend-note, #view-fryer, #view-bakery, .bottom-nav, #master-modal, #copy-modal, #image-modal { display: none !important; }
             #print-wrapper { 
                 display: block !important; position: absolute !important;
                 top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%;
@@ -139,7 +139,7 @@
         .print-header-left { display: flex; flex-direction: column; gap: 2px; }
         .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
         .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
-        .print-warning { font-size: 10px; color: #555; font-weight: bold; }
+        .print-warning { font-size: 11px; color: #555; font-weight: bold; }
         .print-date { font-size: 10px; color: #555; }
         .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
         .print-daily-total div { font-size: 11px; font-weight: bold; }
@@ -171,6 +171,9 @@
         .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .print-shelf.hidden-shelf * { visibility: hidden !important; }
 
+        /* スマホ画面用の注釈ラベル */
+        .legend-note { font-size: 11px; font-weight: bold; color: var(--text-sub); text-align: right; margin: -10px 4px 10px 0; letter-spacing: 0.5px; }
+
     </style>
 </head>
 <body>
@@ -189,6 +192,10 @@
 <div class="main-tab-container">
     <button class="main-tab-btn active" id="tab-fryer" onclick="switchTab('fryer')">🍗 フライヤー</button>
     <button class="main-tab-btn" id="tab-bakery" onclick="switchTab('bakery')">🥐 焼成パン(常温)</button>
+</div>
+
+<div class="legend-note">
+    ※ 🌊（波型）＝ 波型什器を使用
 </div>
 
 <div id="view-fryer">
@@ -257,7 +264,7 @@
 <div id="image-modal">
     <h3 style="margin-top:0;">ネットプリント用画像</h3>
     <p style="font-size: 13px; color: var(--711-red); font-weight: bold; background: #ffeeee; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
-        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存}$をタップしてください。
+        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存」をタップしてください。
     </p>
     <div id="image-result-container" style="text-align:center; overflow-y:auto; max-height:55vh; border:2px solid var(--border-color); border-radius: 8px; background:#fff; padding: 4px;"></div>
     <button class="btn-sub" style="width:100%; margin-top: 16px; padding: 14px;" onclick="closeImageModal()">閉じる</button>
@@ -312,7 +319,6 @@
             let qtyOpts = ''; for(let q=0; q<=20; q++) qtyOpts += `<option value="${q}" ${data.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">>< 1F戻す</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">◀▶ 2F展開</button>` : '');
             
-            // 波型什器のチェックボックスを組み込み
             slotEl.innerHTML = `
                 <div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div>
                 <select onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select>
@@ -373,7 +379,6 @@
             let qtyOpts=''; for(let q=0; q<=20; q++) qtyOpts+=`<option value="${q}" ${d.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">>< 1F戻す</button>` : (i===0 ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">◀▶ 2F展開</button>` : '');
             
-            // 波型什器のチェックボックスを組み込み
             slotEl.innerHTML=`
                 <div class="slot-header"><span>${isExp?'2フェイス展開':(i===0?'左フェイス':'右フェイス')}</span>${btn}</div>
                 <select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select>
@@ -417,14 +422,24 @@
     function resetMaster() { if(confirm("初期状態に戻しますか？\n（※現在入力されている仕込みの数やレイアウトは消えません）")) { if(currentTab==='fryer') { f_productMaster=[...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster=[...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); flashSaveIndicator(); updateGrandTotal(); } }
 
     function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; const wLbl=globalWeather==='normal'?'通常':'雨天'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${wLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在選択中の天気パターン内でのみコピーされます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
-    function closeCopyModal() { document.getElementById('copy-modal').style.none; }
+    function closeCopyModal() { document.getElementById('copy-modal').style.display='none'; }
     function executeCopy(srcTime) { if(!confirm('上書きされます。よろしいですか？')) return; const tk=`${globalDay}_${globalTime}_${globalWeather}`; const sk=`${globalDay}_${srcTime}_${globalWeather}`; if(currentTab==='fryer') { f_appData[tk]=JSON.parse(JSON.stringify(f_appData[sk])); f_sysState.hidden[tk]=JSON.parse(JSON.stringify(f_sysState.hidden[sk])); localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData)); localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState)); f_updateHideUI(); f_renderAll(); } else { b_appData[tk]=JSON.parse(JSON.stringify(b_appData[sk])); b_sysState.hidden[tk]=JSON.parse(JSON.stringify(b_sysState.hidden[sk])); localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData)); localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState)); b_updateHideUI(); b_renderAll(); } closeCopyModal(); updateGrandTotal(); flashSaveIndicator(); }
 
     function closeImageModal() { document.getElementById('image-modal').style.display='none'; }
 
     /* =========================================================
-       共通HTMLビルダ (印刷＆画像保存の両方で使います)
+       共通HTMLビルダ (印刷＆画像保存 両対応)
        ========================================================= */
+    const getOptimalFontSize = (text, hasWave, widthRatio) => {
+        if(!text) return "11px";
+        let len = text.length + (hasWave ? 4 : 0);
+        let normalizedLen = len / (widthRatio / 0.25);
+        if (normalizedLen >= 14.5) return "7.5px";
+        if (normalizedLen >= 11.5) return "8.5px";
+        if (normalizedLen >= 8.5) return "9.5px";
+        return "11px";
+    };
+
     function buildPrintHTML() {
         const container = document.getElementById('print-container');
         const now = new Date(); const dStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 出力`;
@@ -435,10 +450,13 @@
         const weatherSuffix = globalWeather; 
         const titleSuffix = globalWeather === 'rainy' ? '（雨天用）' : '';
 
+        // 印刷ヘッダーに表示する共通の注意書き
+        const printWarningText = "※A4サイズ1枚に収まります　★（波型）＝ 波型什器使用";
+
         if(currentTab === 'fryer') {
             times.forEach(t => { days.forEach(d => { let sum=0; for(let s=1; s<=4; s++){ const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!f_sysState.hidden[key][s]){ for(let i=0; i<4; i++){ const dt=f_appData[key][s][i]; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
 
-            let html = `<div class="print-header mode-fryer"><div class="print-header-left"><div class="print-title"><span>フライヤー仕込み表 ${titleSuffix}</span></div><div class="print-warning">※A4サイズ1枚に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-fryer">`;
+            let html = `<div class="print-header mode-fryer"><div class="print-header-left"><div class="print-title"><span>フライヤー仕込み表 ${titleSuffix}</span></div><div class="print-warning">${printWarningText}</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-fryer">`;
             times.forEach(t => { html += `<div class="print-row">`; days.forEach(d => {
                 const key = `${d.id}_${t.id}_${weatherSuffix}`; const slotsData = f_appData[key]; let shiftTotal=0;
                 for(let s=1; s<=4; s++){ if(!f_sysState.hidden[key][s]){ for(let i=0; i<4; i++){ const dt=slotsData[s][i]; const p=f_productMaster.find(x=>x.name===dt.name); if(p) shiftTotal+=p.price*(dt.qty||0); if(dt.span===2) i++; } } }
@@ -449,9 +467,12 @@
                     for(let i=0; i<4; i++){ 
                         const dt=slotsData[s][i]; const q=dt.qty||0; 
                         const nm=(dt.name==="未設定"||q===0)?"":dt.name; 
-                        // 波型チェックが入っていれば「（波型）」を付与
-                        const waveMark = (dt.wave && nm) ? " <span style='font-size:10px; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>" : "";
-                        html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
+                        
+                        const widthRatio = (dt.span === 2) ? 0.5 : 0.25;
+                        const fSize = getOptimalFontSize(nm, dt.wave, widthRatio);
+                        
+                        const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>` : "";
+                        html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name" style="font-size:${fSize}; line-height:1.15;">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
                         if(dt.span===2) i++; 
                     }
                     html += `</div></div>`;
@@ -461,7 +482,7 @@
         } else {
             const uCnt = b_sysState.unitCount;
             times.forEach(t => { days.forEach(d => { let sum=0; for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!b_sysState.hidden[key][u][s]){ for(let i=0; i<2; i++){ const dt=b_appData[key][u][s][i]; if(!dt)continue; const p=b_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
-            let html = `<div class="print-header mode-bakery"><div class="print-header-left"><div class="print-title"><span>常温パン仕込み表 ${titleSuffix}</span><span class="print-title-sub">（${uCnt}台運用）</span></div><div class="print-warning">※A4サイズ1枚に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-bakery">`;
+            let html = `<div class="print-header mode-bakery"><div class="print-header-left"><div class="print-title"><span>常温パン仕込み表 ${titleSuffix}</span><span class="print-title-sub">（${uCnt}台運用）</span></div><div class="print-warning">${printWarningText}</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-bakery">`;
             times.forEach(t => { html += `<div class="print-row">`; days.forEach(d => {
                 const key = `${d.id}_${t.id}_${weatherSuffix}`; const slotsData = b_appData[key]; let shiftTotal=0;
                 for(let u=1; u<=uCnt; u++){ for(let s=1; s<=4; s++){ if(!b_sysState.hidden[key][u][s]){ for(let i=0; i<2; i++){ const dt=slotsData[u][s][i]; const p=b_productMaster.find(x=>x.name===dt.name); if(p) shiftTotal+=p.price*(dt.qty||0); if(dt.span===2) i++; } } } }
@@ -474,9 +495,13 @@
                         for(let i=0; i<2; i++){ 
                             const dt=slotsData[u][s][i]; const q=dt.qty||0; 
                             const nm=(dt.name==="未設定"||q===0)?"":dt.name; const isExp = dt.span===2; 
-                            // 波型チェックが入っていれば「（波型）」を付与
-                            const waveMark = (dt.wave && nm) ? " <span style='font-size:10px; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>" : "";
-                            html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
+                            
+                            const unitWidth = (uCnt === 2) ? 0.5 : 1.0;
+                            const widthRatio = (isExp ? 1.0 : 0.5) * unitWidth;
+                            const fSize = getOptimalFontSize(nm, dt.wave, widthRatio);
+
+                            const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>` : "";
+                            html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name" style="font-size:${fSize}; line-height:1.15;">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
                             if(isExp) i++; 
                         }
                         html += `</div></div>`;
