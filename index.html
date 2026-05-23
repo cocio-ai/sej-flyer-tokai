@@ -261,7 +261,7 @@
 
 <script>
     /* =========================================================
-       共通・システム設定（天気軸拡張版：v6 / v2）
+       共通・システム設定
        ========================================================= */
     let currentTab = 'fryer'; let globalDay = 'weekday'; let globalTime = 'morning'; let globalWeather = 'normal';
     let appPrefs = JSON.parse(localStorage.getItem('sej_app_prefs_v2')) || { tab: 'fryer', day: 'weekday', time: 'morning', weather: 'normal' };
@@ -271,7 +271,7 @@
     function flashSaveIndicator() { const ind = document.getElementById('save-indicator'); ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0.5'; }, 800); }
 
     /* =========================================================
-       フライヤー用データ＆ロジック (天気軸を末尾に統合：v6)
+       フライヤー用データ＆ロジック
        ========================================================= */
     let f_sysState = JSON.parse(localStorage.getItem('sej_flyer_sys_v6'));
     if(!f_sysState) {
@@ -282,8 +282,27 @@
         }); }); });
         localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState));
     }
-    const f_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ななチキ", price: 250.56 }, { name: "ザクチキ", price: 250.56 }, { name: "揚げ鶏", price: 250.56 }, { name: "BIGポークフランク", price: 213.84 }, { name: "からあげ棒", price: 213.84 }, { name: "アメリカンドッグ", price: 150.12 }, { name: "カレーパン", price: 160.92 }, { name: "牛肉コロッケ", price: 108.00 }, { name: "五目春巻き", price: 129.60 }, { name: "ハッシュポテト", price: 129.60 }, { name: "ささみ揚げ", price: 190.08 }];
+    
+    // 【更新】フライヤーの最新デフォルトラインナップ
+    const f_defaultMaster = [
+        { name: "未設定", price: 0 },
+        { name: "ななチキ", price: 250.56 },
+        { name: "ザクチキ", price: 250.56 },
+        { name: "揚げ鶏", price: 250.56 },
+        { name: "BIGポークフランク", price: 213.84 },
+        { name: "からあげ棒", price: 198.72 },
+        { name: "アメリカンドッグ", price: 150.12 },
+        { name: "牛肉コロッケ", price: 108.00 },
+        { name: "牛肉コロッケ（塩胡椒）", price: 128.52 },
+        { name: "五目春巻", price: 129.60 },
+        { name: "ハッシュポテト", price: 120.96 },
+        { name: "ささみ揚げ", price: 190.08 },
+        { name: "揚げたこ焼き（6個）", price: 427.68 },
+        { name: "揚げたこ焼き（3個）", price: 213.84 },
+        { name: "サクッとチキン（ピザ）", price: 180.36 }
+    ];
     let f_productMaster = JSON.parse(localStorage.getItem('sej_flyer_master_v5')) || [...f_defaultMaster];
+    
     let f_appData = JSON.parse(localStorage.getItem('sej_flyer_data_v6'));
     if (!f_appData) {
         f_appData = {}; const oldData = JSON.parse(localStorage.getItem('sej_flyer_data_v5')) || {};
@@ -316,7 +335,7 @@
     function f_calcSum(weatherMode = globalWeather) { let sum=0; const slots=f_appData[`${globalDay}_${globalTime}_${weatherMode}`]; for(let s=1; s<=4; s++){ for(let i=0; i<4; i++){ const d=slots[s][i]; const p=f_productMaster.find(x=>x.name===d.name); sum+=(p?p.price:0)*(d.qty||0); if(d.span===2) i++; } } return Math.floor(sum); }
 
     /* =========================================================
-       パン・常温用データ＆ロジック (天気軸対応：v2)
+       パン・常温用データ＆ロジック
        ========================================================= */
     let b_sysState = JSON.parse(localStorage.getItem('sej_bakery_sys_v2'));
     if(!b_sysState) {
@@ -327,8 +346,23 @@
         }); }); });
         localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState));
     }
-    const b_defaultMaster = [{ name: "未設定", price: 0 }, { name: "ふんわりメロンパン", price: 160.92 }, { name: "チョコクッキー", price: 200.88 }, { name: "ソーセージフランス", price: 250.56 }, { name: "たい焼き", price: 190.08 }];
+    
+    // 【更新】常温パンの最新デフォルトラインナップ
+    const b_defaultMaster = [
+        { name: "未設定", price: 0 },
+        { name: "ふんわりメロンパン", price: 160.92 },
+        { name: "カリッじゅワッサン", price: 230.04 },
+        { name: "サクサククロワッサン", price: 190.08 },
+        { name: "チョコクロワッサン", price: 210.60 },
+        { name: "フィナンシェ", price: 160.92 },
+        { name: "チョコクッキー", price: 200.88 },
+        { name: "ソーセージフランス", price: 250.56 },
+        { name: "明太子フランス", price: 250.56 },
+        { name: "たい焼き", price: 190.08 },
+        { name: "お店で揚げたカレーパン", price: 160.92 }
+    ];
     let b_productMaster = JSON.parse(localStorage.getItem('sej_bakery_master_v1')) || [...b_defaultMaster];
+    
     let b_appData = JSON.parse(localStorage.getItem('sej_bakery_data_v2'));
     if (!b_appData) {
         b_appData = {}; const oldData = JSON.parse(localStorage.getItem('sej_bakery_data_v1')) || {};
@@ -383,7 +417,22 @@
     function openMaster() { document.getElementById('master-modal-title').textContent = currentTab === 'fryer' ? 'フライヤー商品更新' : 'パン商品更新'; document.getElementById('master-input').value = (currentTab === 'fryer' ? f_productMaster : b_productMaster).map(p => `${p.name}\n${p.price}`).join('\n'); document.getElementById('master-modal').style.display='block'; }
     function closeMaster() { document.getElementById('master-modal').style.display='none'; }
     function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const n=lines[i]?lines[i].trim():''; const p=lines[i+1]?lines[i+1].match(/[\d.]+/):null; if(n&&n!=="未設定") newList.push({name:n, price:p?parseFloat(p[0]):0}); } if(currentTab==='fryer') { f_productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster = newList; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); updateGrandTotal(); flashSaveIndicator(); }
-    function resetMaster() { if(confirm("初期状態に戻しますか？")) { if(currentTab==='fryer') { f_productMaster=[...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster=[...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); flashSaveIndicator(); updateGrandTotal(); } }
+    
+    // 【更新】初期化ボタンを押した際に、新しいラインナップを呼び出す処理
+    function resetMaster() { 
+        if(confirm("初期状態に戻しますか？\n（※現在入力されている仕込みの数やレイアウトは消えません）")) { 
+            if(currentTab==='fryer') { 
+                f_productMaster=[...f_defaultMaster]; 
+                localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); 
+                f_renderAll(); 
+            } else { 
+                b_productMaster=[...b_defaultMaster]; 
+                localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); 
+                b_renderAll(); 
+            } 
+            closeMaster(); flashSaveIndicator(); updateGrandTotal(); 
+        } 
+    }
 
     function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; const wLbl=globalWeather==='normal'?'通常':'雨天'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${wLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在選択中の天気パターン内でのみコピーされます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
     function closeCopyModal() { document.getElementById('copy-modal').style.display='none'; }
@@ -401,13 +450,11 @@
         const days = [{id:'weekday', label:'平日', class:'weekday'}, {id:'holiday', label:'土日祝', class:'holiday'}];
         let totalW=0, totalH=0;
 
-        // 現在開いている「天気（通常/雨天）」に基づいて6ブロックを集計・構築する
         const weatherSuffix = globalWeather; 
         const titleSuffix = globalWeather === 'rainy' ? '（雨天用）' : '';
 
         if(currentTab === 'fryer') {
             times.forEach(t => { days.forEach(d => { let sum=0; const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!f_sysState.hidden[key]){ for(let i=0; i<4; i++){ const dt=f_appData[key][s]?.[i] || f_appData[key][1][i]; if(!dt)continue; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } }); });
-            // 正確な総計
             times.forEach(t => { days.forEach(d => { let sum=0; for(let s=1; s<=4; s++){ const key = `${d.id}_${t.id}_${weatherSuffix}`; if(!f_sysState.hidden[key][s]){ for(let i=0; i<4; i++){ const dt=f_appData[key][s][i]; const p=f_productMaster.find(x=>x.name===dt.name); if(p) sum+=(p.price*(dt.qty||0)); if(dt.span===2) i++; } } } if(d.id==='weekday') totalW+=sum; else totalH+=sum; }); });
 
             let html = `<div class="print-header mode-fryer"><div class="print-header-left"><div class="print-title"><span>フライヤー仕込み表 ${titleSuffix}</span></div><div class="print-warning">※A4サイズ1枚に収まります</div><div class="print-date">${dStr}</div></div><div class="print-daily-total"><div style="color:var(--print-blue)">平日 1日合計: <span>¥${Math.floor(totalW).toLocaleString()}</span></div><div style="color:var(--print-red)">休日 1日合計: <span>¥${Math.floor(totalH).toLocaleString()}</span></div></div></div><div class="print-grid mode-fryer">`;
