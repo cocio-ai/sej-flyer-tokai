@@ -35,13 +35,13 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
             background-color: var(--bg-color); margin: 0;
-            padding: 10px 10px 275px 10px; color: var(--text-main);
+            padding: 10px 10px 270px 10px; color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ヘッダー（ダーク＆モダンUI） */
+        /* ヘッダー */
         .header {
             position: sticky; top: 0;
             background: rgba(24, 28, 36, 0.94);
@@ -50,17 +50,16 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
             display: flex; justify-content: space-between; align-items: center;
-            margin: -10px -10px 12px -10px;
+            margin: -10px -10px 10px -10px;
         }
-        .header-left { display: flex; flex-direction: column; gap: 3px; }
+        .header-left { display: flex; flex-direction: column; gap: 2px; }
         .app-title-main {
-            font-weight: 900; font-size: 18px; letter-spacing: 0.4px; color: #ffffff;
+            font-weight: 900; font-size: 18px; letter-spacing: 0.5px; color: #ffffff;
             line-height: 1.2; display: flex; align-items: center; gap: 6px;
         }
         .app-title-badge {
             font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
             background: var(--theme-accent); color: #fff; letter-spacing: 0.5px;
-            transition: background 0.3s;
         }
         .app-title-sub-row { display: flex; align-items: center; gap: 8px; }
         .app-title-sub { font-size: 10px; font-weight: 700; color: #94a3b8; }
@@ -70,23 +69,13 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 5px 10px; border-radius: 10px;
-            letter-spacing: -0.5px; font-variant-numeric: tabular-nums;
+            letter-spacing: -0.5px;
         }
 
         /* タブ切り替え */
-        .main-tab-container {
-            display: flex; background: #dde2ea; border-radius: 12px; padding: 4px;
-            margin-bottom: 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
-        }
-        .main-tab-btn {
-            flex: 1; border: none; padding: 12px 8px; border-radius: 9px;
-            font-size: 15px; font-weight: 800; background: transparent; color: var(--text-sub);
-            transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px;
-        }
-        .main-tab-btn.active {
-            background: #fff; color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
+        .main-tab-container { display: flex; background: #dde2ea; border-radius: 12px; padding: 4px; margin-bottom: 12px; }
+        .main-tab-btn { flex: 1; border: none; padding: 12px 8px; border-radius: 8px; font-size: 15px; font-weight: 800; background: transparent; color: var(--text-sub); transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px;}
+        .main-tab-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         
         /* Bakery専用 台数トグル */
         .unit-toggle-container { display: flex; background: #e5e0dc; border-radius: 12px; padding: 4px; margin-bottom: 16px; }
@@ -94,29 +83,11 @@
         .unit-toggle-btn.active { background: #fff; color: var(--bakery-orange); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
         /* 什器（共通カードデザイン） */
-        .shelf {
-            background: var(--card-bg); border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-            margin-bottom: 12px; border: 1px solid #e2e8f0;
-            overflow: hidden; transition: opacity 0.3s ease;
-        }
-        .shelf-header {
-            background: linear-gradient(to right, #f8fafc, #ffffff);
-            padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
-            font-weight: 800; font-size: 13px; color: #334155;
-            border-bottom: 1px solid var(--border-color);
-        }
+        .shelf { background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05); margin-bottom: 12px; border: 1px solid #e2e8f0; overflow: hidden; transition: opacity 0.3s ease; }
+        .shelf-header { background: linear-gradient(to right, #f8fafc, #ffffff); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 13px; color: #334155; border-bottom: 1px solid var(--border-color); }
         .shelf-title-badge { display: inline-flex; align-items: center; gap: 6px; }
-        .shelf-title-badge::before {
-            content: ""; display: inline-block; width: 4px; height: 14px;
-            background: var(--theme-accent); border-radius: 2px; transition: background 0.3s;
-        }
-        .hide-label {
-            background: #f1f5f9; padding: 6px 12px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; color: var(--text-sub);
-            border: 1px solid var(--border-color); cursor: pointer;
-            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-        }
+        .shelf-title-badge::before { content: ""; display: inline-block; width: 4px; height: 14px; background: var(--theme-accent); border-radius: 2px; }
+        .hide-label { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--text-sub); border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .hide-label:has(input:checked) { background: #1e293b; color: #fff; border-color: #1e293b; }
         .hide-label input { margin: 0; accent-color: var(--theme-accent); }
         .shelf.hidden { opacity: 0.45; }
@@ -126,60 +97,22 @@
         #view-fryer .shelf-body { padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         #view-bakery .shelf-body { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-        /* スロット共通（操作感維持しつつCSSだけで状態強調） */
-        .slot {
-            background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;
-            padding: 8px; display: flex; flex-direction: column; gap: 6px;
-            transition: all 0.2s ease;
-        }
-        .slot.has-qty {
-            background: #ffffff;
-            border-color: var(--theme-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .slot.expanded {
-            grid-column: span 2;
-            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-            border-color: #86efac;
-        }
+        /* スロット共通 */
+        .slot { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s ease; }
+        .slot.has-qty { background: #ffffff; border-color: var(--theme-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .slot.expanded { grid-column: span 2; background: #f0fdf4; border: 1.5px solid #86efac; }
         .slot-header { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-sub); font-weight: 800; }
-        .expand-btn {
-            background: #fff; border: 1px solid #cbd5e1; border-radius: 6px;
-            font-size: 10px; padding: 4px 8px; cursor: pointer; font-weight: 700;
-            color: #475569; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-        }
-        select {
-            width: 100%; border: 1px solid transparent; padding: 8px 4px; border-radius: 8px;
-            font-size: 11px; font-weight: 700; background: #edf2f7; color: var(--text-main);
-            text-align: center; text-overflow: ellipsis; appearance: none; -webkit-appearance: none;
-            transition: all 0.2s;
-        }
-        .slot.has-qty select:not(.qty-select) {
-            background: var(--theme-soft); border-color: var(--theme-border);
-        }
+        .expand-btn { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 10px; padding: 4px 8px; cursor: pointer; font-weight: 700; color: #475569; }
+        select { width: 100%; border: 1px solid transparent; padding: 8px 4px; border-radius: 8px; font-size: 11px; font-weight: 700; background: #edf2f7; color: var(--text-main); text-align: center; text-overflow: ellipsis; appearance: none; -webkit-appearance: none; }
+        .slot.has-qty select:not(.qty-select) { background: var(--theme-soft); border-color: var(--theme-border); }
         .qty-row { display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .qty-select {
-            flex: 1; min-width: 0; padding: 6px; font-size: 18px;
-            text-align: center; text-align-last: center; font-weight: 900;
-            border: none; border-radius: 8px; height: 38px;
-            background: #e2e8f0; color: #64748b; transition: all 0.2s;
-        }
-        .slot.has-qty .qty-select {
-            background: var(--theme-accent); color: #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-        }
+        .qty-select { flex: 1; min-width: 0; padding: 6px; font-size: 18px; text-align: center; text-align-last: center; font-weight: 900; border: none; border-radius: 8px; height: 38px; background: #e2e8f0; color: #64748b; }
+        .slot.has-qty .qty-select { background: var(--theme-accent); color: #ffffff; }
         .qty-unit { font-size: 12px; font-weight: 700; color: var(--text-sub); }
 
         /* 波型什器のUIラベル */
-        .wave-label {
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-            font-size: 11px; font-weight: 700; color: var(--text-sub); cursor: pointer;
-            margin-top: 2px; background: #f1f5f9; padding: 4px; border-radius: 6px;
-            border: 1px solid #e2e8f0; transition: all 0.2s;
-        }
-        .wave-label:has(input:checked) {
-            background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;
-        }
+        .wave-label { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--text-sub); cursor: pointer; margin-top: 2px; background: #f1f5f9; padding: 4px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .wave-label:has(input:checked) { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
         .wave-label input { margin: 0; transform: scale(1.0); accent-color: #2563eb; }
 
         /* Bakery 専用微調整 */
@@ -192,29 +125,16 @@
         .unit-title { font-size: 16px; font-weight: 900; margin-bottom: 10px; padding-left: 4px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
         .unit-title::before { content: ""; display: block; width: 4px; height: 16px; background: var(--bakery-orange); border-radius: 2px; }
 
-        /* 下部ナビゲーション（以前の2列×2行レイアウト完全維持＋質感アップ） */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.08);
-            padding: 12px 16px 24px 16px; z-index: 1000;
-            border-top-left-radius: 24px; border-top-right-radius: 24px;
-            border-top: 1px solid rgba(0,0,0,0.06);
-        }
+        /* 下部ナビゲーション */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.08); padding: 12px 16px 24px 16px; z-index: 1000; border-top-left-radius: 24px; border-top-right-radius: 24px; border-top: 1px solid rgba(0,0,0,0.06); }
         .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn {
-            flex: 1; border: 1px solid #e2e8f0; padding: 12px 4px; border-radius: 12px;
-            font-size: 14px; font-weight: 800; background: #f8fafc; color: var(--text-sub);
-            transition: all 0.2s ease;
-        }
+        .btn { flex: 1; border: 1px solid #e2e8f0; padding: 12px 4px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #f8fafc; color: var(--text-sub); transition: all 0.2s ease; }
         .btn.active { background: var(--711-green); color: #fff; border-color: var(--711-green); box-shadow: 0 4px 10px rgba(0, 128, 96, 0.22); }
         .btn.weather-btn.active { background: #007aff; border-color: #007aff; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.22); }
         
-        /* アクションボタン（以前の押しやすい2×2グリッド） */
+        /* アクションボタン */
         .action-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .btn-sub, .btn-main { width: 100%; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; padding: 14px 4px; transition: transform 0.1s; }
-        .btn-sub:active, .btn-main:active { transform: scale(0.98); }
+        .btn-sub, .btn-main { width: 100%; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; padding: 14px 4px; }
         .btn-sub { background: #334155; color: #fff; }
         .btn-sub.copy { background: #007aff; }
         .btn-main { background: var(--711-orange); color: #fff; box-shadow: 0 4px 12px rgba(255, 102, 0, 0.25); transition: background 0.3s; }
@@ -224,7 +144,7 @@
         textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
 
         /* スマホ画面用の注釈ラベル */
-        .legend-note { font-size: 11px; font-weight: bold; color: var(--text-sub); text-align: right; margin: -6px 4px 10px 0; letter-spacing: 0.5px; }
+        .legend-note { font-size: 11px; font-weight: bold; color: var(--text-sub); text-align: right; margin: -4px 4px 10px 0; letter-spacing: 0.5px; }
         .legend-pill { background: #fff; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border-color); display: inline-block; }
 
         /* =========================================
@@ -234,7 +154,7 @@
         .export-mode .header, .export-mode .main-tab-container, .export-mode .legend-note, .export-mode #view-fryer, .export-mode #view-bakery, .export-mode .bottom-nav, .export-mode #master-modal, .export-mode #copy-modal, .export-mode #image-modal { display: none !important; }
         .export-mode #print-wrapper { display: block !important; width: 794px !important; height: 1050px !important; background: white; position: absolute; top: 0; left: 0; z-index: 9999; }
         
-        /* [最強の1枚ロック] 印刷用スタイル */
+        /* [最強の1枚ロック] 印刷用スタイル（完全復元） */
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             html, body { 
@@ -257,7 +177,7 @@
         .print-header-left { display: flex; flex-direction: column; gap: 2px; }
         .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
         .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
-        .print-warning { font-size: 11px; color: #555; font-weight: bold; }
+        .print-warning { font-size: 10.5px; color: #555; font-weight: bold; }
         .print-date { font-size: 10px; color: #555; }
         .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
         .print-daily-total div { font-size: 11px; font-weight: bold; }
@@ -303,7 +223,7 @@
             <span class="save-status" id="save-indicator">✓ 自動保存</span>
         </div>
     </div>
-    <div class="total-display" id="grand-total">売価合計: ¥0</div>
+    <div class="total-display" id="grand-total">¥0</div>
 </div>
 
 <!-- メインタブ -->
@@ -366,7 +286,7 @@
     </div>
 </div>
 
-<!-- モーダル群 -->
+<!-- モーダル群（元の仕様・配置に完全復元） -->
 <div id="master-modal">
     <h3 style="margin-top:0;" id="master-modal-title">商品マスター更新</h3>
     <textarea id="master-input"></textarea>
