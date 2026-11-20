@@ -14,242 +14,48 @@
     <style>
         :root {
             --711-green: #008060;
-            --711-green-dark: #005c45;
-            --711-red: #e60012;
+            --711-red: #ee0000;
             --711-orange: #ff6600;
             --bakery-orange: #d35400; 
+            --theme-accent: #ff6600;
+            --theme-soft: #fff7ed;
+            --theme-border: #fed7aa;
             --bg-color: #eef1f5;
             --card-bg: #ffffff;
             --text-main: #111827;
             --text-sub: #6b7280;
             --border-color: #e5e7eb;
-            --print-blue: #1e40af;
-            --print-red: #b91c1c;
+            --print-blue: #1a73e8;
+            --print-red: #d93025;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif;
-            background: linear-gradient(180deg, #e5e9f0 0%, #f4f6f9 100%);
-            background-attachment: fixed;
-            margin: 0;
-            padding: 12px 12px 275px 12px;
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ヘッダー（グラスモーフィズム＆モダンタイポ） */
-        .header {
-            position: sticky; top: 0;
-            background: rgba(255, 255, 255, 0.82);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            z-index: 100; padding: 12px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            display: flex; justify-content: space-between; align-items: center;
-            margin: -12px -12px 14px -12px;
-        }
-        .header-left { display: flex; flex-direction: column; gap: 3px; }
-        .app-title-main {
-            font-weight: 900; font-size: 19px; letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #111827 0%, #374151 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1.1;
-        }
-        .app-title-sub-row { display: flex; align-items: center; gap: 8px; }
-        .app-title-sub { font-size: 11px; font-weight: 700; color: var(--text-sub); }
-        .save-status {
-            font-size: 9px; color: var(--711-green); font-weight: 800;
-            background: #ecfdf5; border: 1px solid #a7f3d0;
-            padding: 1px 6px; border-radius: 10px;
-            opacity: 0.6; transition: all 0.3s;
-        }
-        .total-badge {
-            background: #111827; color: #fff;
-            padding: 6px 12px; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: flex-end;
-            box-shadow: 0 4px 12px rgba(17, 24, 39, 0.15);
-        }
-        .total-label { font-size: 9px; font-weight: 700; color: #9ca3af; letter-spacing: 0.5px; }
-        .total-display {
-            font-size: 20px; font-weight: 900; color: #ffffff;
-            font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1.1;
-        }
-
-        /* タブ切り替え（セグメントコントロール風） */
-        .main-tab-container {
-            display: flex; background: rgba(17, 24, 39, 0.06);
-            border-radius: 14px; padding: 4px; margin-bottom: 12px;
-        }
-        .main-tab-btn {
-            flex: 1; border: none; padding: 11px 8px; border-radius: 10px;
-            font-size: 14px; font-weight: 800; background: transparent;
-            color: var(--text-sub); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; justify-content: center; align-items: center; gap: 6px;
-        }
-        .main-tab-btn.active {
-            background: #ffffff; color: var(--text-main);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        }
-        
-        /* 注釈インフォメーションバー */
-        .legend-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 10px; padding: 6px 12px; margin-bottom: 12px;
-        }
-        .legend-pill {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 11px; font-weight: 800; color: #c2410c;
-            background: #fff7ed; border: 1px solid #fed7aa;
-            padding: 2px 8px; border-radius: 20px;
-        }
-        .legend-hint { font-size: 10px; font-weight: 700; color: var(--text-sub); }
-
-        /* Bakery専用 台数トグル */
-        .unit-toggle-container {
-            display: flex; background: rgba(211, 84, 0, 0.08);
-            border-radius: 12px; padding: 4px; margin-bottom: 14px;
-        }
-        .unit-toggle-btn {
-            flex: 1; border: none; padding: 9px; border-radius: 9px;
-            font-size: 13px; font-weight: 800; background: transparent;
-            color: var(--text-sub); transition: all 0.2s;
-        }
-        .unit-toggle-btn.active {
-            background: #fff; color: var(--bakery-orange);
-            box-shadow: 0 2px 8px rgba(211, 84, 0, 0.12);
-        }
-
-        /* 什器（ショーケース風カードデザイン） */
-        .shelf {
-            background: var(--card-bg); border-radius: 18px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
-            margin-bottom: 14px; border: 1px solid rgba(255, 255, 255, 0.8);
-            overflow: hidden; transition: all 0.3s ease;
-        }
-        .shelf-header {
-            background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
-            padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
-            font-weight: 800; font-size: 13px; color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        .shelf-title-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .shelf-title-badge::before {
-            content: ""; display: inline-block; width: 4px; height: 14px;
-            background: var(--711-green); border-radius: 2px;
-        }
-        #view-bakery .shelf-title-badge::before { background: var(--bakery-orange); }
-
-        .hide-label {
-            background: #ffffff; padding: 5px 11px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; color: var(--text-sub);
-            border: 1px solid var(--border-color); cursor: pointer;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03); transition: all 0.2s;
-        }
-        .hide-label:has(input:checked) {
-            background: #1f2937; color: #ffffff; border-color: #1f2937;
-        }
-        .hide-label input { margin: 0; accent-color: #1f2937; }
-        .shelf.hidden { opacity: 0.45; }
-        .shelf.hidden .shelf-body { display: none; }
-
-        /* グリッド分岐 */
-        #view-fryer .shelf-body { padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #fafbfc; }
-        #view-bakery .shelf-body { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #fcfaf8; }
-
-        /* スロット（トレイ風デザイン） */
-        .slot {
-            background: #ffffff; border: 1.5px solid #e5e7eb;
-            border-radius: 14px; padding: 8px 6px;
-            display: flex現場のオーナー様やスタッフの皆様が毎日触れるツールだからこそ、「ただの業務用の事務画面」ではなく、開くたびにテンションが上がるような**洗練されたプロ仕様のモダンUI（Apple製品や最新の店舗管理システムのような質感）**にブラッシュアップしました！
-
-これまでの入力データや商品マスター、雨天・波型機能は**100%そのまま引き継がれます**。
-
-### 🎨 今回の「カッコよさ」アップデート内容
-
-1. **ヘッダー＆タブの高級感アップ（ダークスレート＆グラスモーフィズム）**
-   * アプリの顔である最上部のヘッダーを、引き締まった**ディープスレート（濃紺グレー）**に変更。右上の「売価合計」をバッジデザインにして視認性とプロ感を高めました。
-   * フライヤー（オレンジ系アクセント）と焼成パン（アンバーブラウン系アクセント）で、タブを切り替えると画面全体のテーマカラーが連動して変化します。
-2. **「個数があるマス」の視覚的ハイライト**
-   * 0個のマスは控えめなグレーに、**1個以上入力されたマスは立体感のある白カード＋テーマカラーの枠線＆数字強調**になるようにしました。パッと見ただけで「どこに何個入っているか」が直感的にわかります。
-   * 「🌊 波型」にチェックを入れると、トグルスイッチのように色がパッと変わる気持ちいいアニメーションを追加しました。
-3. **ボトムナビゲーションのスマート化**
-   * 画面下部の操作パネルの余白を最適化し、少しスリムに洗練させました（下の棚が隠れにくくなっています）。また、「☀️通常 / ☔雨天」の切り替えに合わせて、雨天時はクールなブルー基調のアクセントが光ります。
-4. **印刷・画像出力のデザインもプロ仕様に刷新**
-   * 白黒印刷でもクッキリ美しく、かつモダンに見えるタイポグラフィと枠線バランス（角丸の洗練されたブロックデザイン、コントラストの効いたヘッダー帯）に調整しました。
-
-以下のコードで `index.html` を上書き保存して、生まれ変わったデザインをぜひ体感してください！
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Store Planner - セブン仕込み統合ツール</title>
-    
-    <meta property="og:title" content="Smart Store Planner - セブン仕込み統合ツール">
-    <meta property="og:description" content="フライヤー・常温パンの仕込み表をカンタン作成・印刷・画像保存できるプロ仕様ツールです。">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Smart Store Planner">
-
-    <script src="[https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js](https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js)"></script>
-    <style>
-        :root {
-            --711-green: #008060;
-            --711-red: #e60012;
-            --711-orange: #ff6600;
-            --bakery-orange: #c85a17;
-            --theme-accent: #ff6600;
-            --theme-soft: #fff5eb;
-            --theme-border: #ffd8b8;
-            
-            --bg-color: #eef1f5;
-            --card-bg: #ffffff;
-            --header-bg: #181c24;
-            --text-main: #181c24;
-            --text-sub: #64748b;
-            --border-color: #e2e8f0;
-            
-            --print-blue: #1e40af;
-            --print-red: #b91c1c;
-        }
-
         body.theme-bakery {
-            --theme-accent: #c85a17;
+            --theme-accent: #d35400;
             --theme-soft: #fdf6f0;
             --theme-border: #f3d5bd;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
             background-color: var(--bg-color); margin: 0;
-            padding: 0 12px 255px 12px; color: var(--text-main);
+            padding: 10px 10px 275px 10px; color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* =========================================
-           モダン・ダークヘッダー
-           ========================================= */
+        /* ヘッダー（ダーク＆モダンUI） */
         .header {
             position: sticky; top: 0;
             background: rgba(24, 28, 36, 0.94);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             z-index: 100; padding: 12px 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin: 0 -12px 14px -12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            display: flex; justify-content: space-between; align-items: center;
+            margin: -10px -10px 12px -10px;
         }
         .header-left { display: flex; flex-direction: column; gap: 3px; }
         .app-title-main {
-            font-weight: 900; font-size: 17px; letter-spacing: 0.6px; color: #ffffff;
-            display: flex; align-items: center; gap: 6px;
+            font-weight: 900; font-size: 18px; letter-spacing: 0.4px; color: #ffffff;
+            line-height: 1.2; display: flex; align-items: center; gap: 6px;
         }
         .app-title-badge {
             font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
@@ -257,71 +63,42 @@
             transition: background 0.3s;
         }
         .app-title-sub-row { display: flex; align-items: center; gap: 8px; }
-        .app-title-sub { font-size: 11px; font-weight: 600; color: #94a3b8; }
-        .save-status {
-            font-size: 10px; color: #34d399; font-weight: 700; opacity: 0.6;
-            transition: opacity 0.3s; display: flex; align-items: center; gap: 2px;
-        }
-        .total-box {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 6px 12px; border-radius: 10px; text-align: right;
-        }
-        .total-label { font-size: 9px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 1px; }
+        .app-title-sub { font-size: 10px; font-weight: 700; color: #94a3b8; }
+        .save-status { font-size: 9px; color: #34d399; font-weight: 800; opacity: 0.6; transition: opacity 0.3s; }
         .total-display {
             font-size: 20px; font-weight: 900; color: #ffffff;
-            font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 5px 10px; border-radius: 10px;
+            letter-spacing: -0.5px; font-variant-numeric: tabular-nums;
         }
 
-        /* =========================================
-           セグメント・メインタブ
-           ========================================= */
+        /* タブ切り替え */
         .main-tab-container {
-            display: flex; background: #dde2ea; border-radius: 14px; padding: 4px;
-            margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            display: flex; background: #dde2ea; border-radius: 12px; padding: 4px;
+            margin-bottom: 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
         }
         .main-tab-btn {
-            flex: 1; border: none; padding: 11px 8px; border-radius: 10px;
-            font-size: 14px; font-weight: 800; background: transparent; color: var(--text-sub);
-            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; justify-content: center; align-items: center; gap: 6px;
+            flex: 1; border: none; padding: 12px 8px; border-radius: 9px;
+            font-size: 15px; font-weight: 800; background: transparent; color: var(--text-sub);
+            transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px;
         }
         .main-tab-btn.active {
-            background: #ffffff; color: var(--text-main);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-
-        /* 注釈バー */
-        .legend-note {
-            display: flex; justify-content: flex-end; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 700; color: var(--text-sub);
-            margin: 0 4px 10px 0;
-        }
-        .legend-pill {
-            background: #ffffff; padding: 3px 10px; border-radius: 20px;
-            border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            background: #fff; color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         
         /* Bakery専用 台数トグル */
-        .unit-toggle-container {
-            display: flex; background: #e6dfd9; border-radius: 12px; padding: 4px; margin-bottom: 14px;
-        }
-        .unit-toggle-btn {
-            flex: 1; border: none; padding: 9px; border-radius: 9px; font-size: 13px;
-            font-weight: 800; background: transparent; color: #786c63; transition: all 0.2s;
-        }
-        .unit-toggle-btn.active {
-            background: #fff; color: var(--bakery-orange); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
+        .unit-toggle-container { display: flex; background: #e5e0dc; border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+        .unit-toggle-btn { flex: 1; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 800; background: transparent; color: var(--text-sub); transition: all 0.2s; }
+        .unit-toggle-btn.active { background: #fff; color: var(--bakery-orange); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
-        /* =========================================
-           什器カードデザイン
-           ========================================= */
+        /* 什器（共通カードデザイン） */
         .shelf {
-            background: var(--card-bg); border-radius: 18px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-            margin-bottom: 14px; border: 1px solid rgba(226, 232, 240, 0.8);
-            overflow: hidden; transition: all 0.3s ease;
+            background: var(--card-bg); border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+            margin-bottom: 12px; border: 1px solid #e2e8f0;
+            overflow: hidden; transition: opacity 0.3s ease;
         }
         .shelf-header {
             background: linear-gradient(to right, #f8fafc, #ffffff);
@@ -329,170 +106,126 @@
             font-weight: 800; font-size: 13px; color: #334155;
             border-bottom: 1px solid var(--border-color);
         }
-        .shelf-title-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-        }
+        .shelf-title-badge { display: inline-flex; align-items: center; gap: 6px; }
         .shelf-title-badge::before {
             content: ""; display: inline-block; width: 4px; height: 14px;
             background: var(--theme-accent); border-radius: 2px; transition: background 0.3s;
         }
         .hide-label {
-            background: #f1f5f9; padding: 5px 12px; border-radius: 20px; font-size: 11px;
-            font-weight: 700; color: var(--text-sub); border: 1px solid var(--border-color);
-            cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s;
+            background: #f1f5f9; padding: 6px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; color: var(--text-sub);
+            border: 1px solid var(--border-color); cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
         }
-        .hide-label:has(input:checked) {
-            background: #1e293b; color: #fff; border-color: #1e293b;
-        }
+        .hide-label:has(input:checked) { background: #1e293b; color: #fff; border-color: #1e293b; }
         .hide-label input { margin: 0; accent-color: var(--theme-accent); }
-        .shelf.hidden { opacity: 0.45; box-shadow: none; }
+        .shelf.hidden { opacity: 0.45; }
         .shelf.hidden .shelf-body { display: none; }
 
         /* グリッド分岐 */
         #view-fryer .shelf-body { padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        #view-bakery .shelf-body { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        #view-bakery .shelf-body { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-        /* =========================================
-           スロット（商品マス）デザイン - アクティブ強調
-           ========================================= */
+        /* スロット共通（操作感維持しつつCSSだけで状態強調） */
         .slot {
-            background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px;
+            background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;
             padding: 8px; display: flex; flex-direction: column; gap: 6px;
-            transition: all 0.2s ease; position: relative;
+            transition: all 0.2s ease;
         }
-        /* 個数が1以上の時の「入ってる感」強調スタイル */
         .slot.has-qty {
             background: #ffffff;
             border-color: var(--theme-border);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .slot.expanded {
             grid-column: span 2;
             background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
             border-color: #86efac;
         }
-        .slot-header {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 10px; color: var(--text-sub); font-weight: 800;
-        }
+        .slot-header { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-sub); font-weight: 800; }
         .expand-btn {
-            background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;
-            font-size: 9px; padding: 3px 6px; cursor: pointer; font-weight: 800;
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 6px;
+            font-size: 10px; padding: 4px 8px; cursor: pointer; font-weight: 700;
             color: #475569; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
-        .expand-btn:active { transform: scale(0.95); }
-
-        select.prod-select {
-            width: 100%; border: 1px solid transparent; padding: 8px 4px; border-radius: 9px;
-            font-size: 11px; font-weight: 700; background: #edf2f7; color: #334155;
+        select {
+            width: 100%; border: 1px solid transparent; padding: 8px 4px; border-radius: 8px;
+            font-size: 11px; font-weight: 700; background: #edf2f7; color: var(--text-main);
             text-align: center; text-overflow: ellipsis; appearance: none; -webkit-appearance: none;
             transition: all 0.2s;
         }
-        .slot.has-qty select.prod-select {
-            background: var(--theme-soft); color: #0f172a; border-color: var(--theme-border);
+        .slot.has-qty select:not(.qty-select) {
+            background: var(--theme-soft); border-color: var(--theme-border);
         }
-
-        .qty-row { display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .qty-row { display: flex; align-items: center; justify-content: center; gap: 6px; }
         .qty-select {
-            flex: 1; min-width: 0; padding: 4px; font-size: 19px;
+            flex: 1; min-width: 0; padding: 6px; font-size: 18px;
             text-align: center; text-align-last: center; font-weight: 900;
-            border: none; border-radius: 9px; height: 38px;
-            background: #e2e8f0; color: #64748b;
-            font-variant-numeric: tabular-nums; transition: all 0.2s;
+            border: none; border-radius: 8px; height: 38px;
+            background: #e2e8f0; color: #64748b; transition: all 0.2s;
         }
         .slot.has-qty .qty-select {
             background: var(--theme-accent); color: #ffffff;
             box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
-        .qty-unit { font-size: 11px; font-weight: 800; color: var(--text-sub); }
+        .qty-unit { font-size: 12px; font-weight: 700; color: var(--text-sub); }
 
-        /* 波型什器のピル型トグルボタン */
+        /* 波型什器のUIラベル */
         .wave-label {
             display: flex; align-items: center; justify-content: center; gap: 4px;
-            font-size: 10px; font-weight: 800; color: #64748b; cursor: pointer;
-            margin-top: 1px; background: #f1f5f9; padding: 5px 4px; border-radius: 8px;
+            font-size: 11px; font-weight: 700; color: var(--text-sub); cursor: pointer;
+            margin-top: 2px; background: #f1f5f9; padding: 4px; border-radius: 6px;
             border: 1px solid #e2e8f0; transition: all 0.2s;
         }
         .wave-label:has(input:checked) {
             background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;
-            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.12);
         }
-        .wave-label input { margin: 0; accent-color: #2563eb; }
+        .wave-label input { margin: 0; transform: scale(1.0); accent-color: #2563eb; }
 
         /* Bakery 専用微調整 */
-        #view-bakery .slot { padding: 10px; gap: 7px; }
-        #view-bakery .slot-header { font-size: 11px; }
-        #view-bakery select.prod-select { padding: 10px 6px; font-size: 13px; }
-        #view-bakery .qty-select { font-size: 22px; height: 42px; }
-        .unit-title {
-            font-size: 15px; font-weight: 900; margin-bottom: 10px; padding-left: 4px;
-            color: #1e293b; display: flex; align-items: center; gap: 8px;
-        }
-        .unit-title::before {
-            content: ""; display: block; width: 5px; height: 18px;
-            background: var(--bakery-orange); border-radius: 3px;
-        }
+        #view-bakery .slot { padding: 10px; gap: 8px; }
+        #view-bakery .slot-header { font-size: 11px; font-weight: 800; }
+        #view-bakery select:not(.qty-select) { padding: 10px 6px; font-size: 13px; background: #f3ece7; }
+        #view-bakery .slot.has-qty select:not(.qty-select) { background: var(--theme-soft); }
+        #view-bakery .qty-select { font-size: 22px; height: 44px; background: #e5e0dc; }
+        #view-bakery .slot.has-qty .qty-select { background: var(--theme-accent); color: #fff; }
+        .unit-title { font-size: 16px; font-weight: 900; margin-bottom: 10px; padding-left: 4px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+        .unit-title::before { content: ""; display: block; width: 4px; height: 16px; background: var(--bakery-orange); border-radius: 2px; }
 
-        /* =========================================
-           フローティング・ボトムナビゲーション
-           ========================================= */
+        /* 下部ナビゲーション（以前の2列×2行レイアウト完全維持＋質感アップ） */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.1);
-            padding: 10px 14px 22px 14px; z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.08);
+            padding: 12px 16px 24px 16px; z-index: 1000;
             border-top-left-radius: 24px; border-top-right-radius: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            border-top: 1px solid rgba(0,0,0,0.06);
         }
-        .btn-group { display: flex; gap: 6px; margin-bottom: 8px; }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
         .btn {
-            flex: 1; border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 11px;
-            font-size: 13px; font-weight: 800; background: #f8fafc; color: #64748b;
-            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            flex: 1; border: 1px solid #e2e8f0; padding: 12px 4px; border-radius: 12px;
+            font-size: 14px; font-weight: 800; background: #f8fafc; color: var(--text-sub);
+            transition: all 0.2s ease;
         }
-        .btn:active { transform: scale(0.97); }
-        .btn.active {
-            background: var(--711-green); color: #fff; border-color: var(--711-green);
-            box-shadow: 0 3px 10px rgba(0, 128, 96, 0.25);
-        }
-        .btn.weather-btn.active#btn-normal {
-            background: #f59e0b; border-color: #f59e0b; color: #fff;
-            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.28);
-        }
-        .btn.weather-btn.active#btn-rainy {
-            background: #2563eb; border-color: #2563eb; color: #fff;
-            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
-        }
+        .btn.active { background: var(--711-green); color: #fff; border-color: var(--711-green); box-shadow: 0 4px 10px rgba(0, 128, 96, 0.22); }
+        .btn.weather-btn.active { background: #007aff; border-color: #007aff; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.22); }
         
-        /* アクションボタン */
-        .action-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
-        .btn-sub, .btn-main {
-            width: 100%; border-radius: 12px; border: none; font-size: 12px;
-            font-weight: 800; padding: 13px 2px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 2px;
-            transition: all 0.2s;
-        }
-        .btn-sub:active, .btn-main:active { transform: scale(0.96); }
+        /* アクションボタン（以前の押しやすい2×2グリッド） */
+        .action-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .btn-sub, .btn-main { width: 100%; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; padding: 14px 4px; transition: transform 0.1s; }
+        .btn-sub:active, .btn-main:active { transform: scale(0.98); }
         .btn-sub { background: #334155; color: #fff; }
-        .btn-sub.copy { background: #0284c7; }
-        .btn-sub.img-save { background: #059669; }
-        .btn-main {
-            background: var(--theme-accent); color: #fff;
-            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.28);
-        }
-        .btn-icon { font-size: 15px; line-height: 1; }
+        .btn-sub.copy { background: #007aff; }
+        .btn-main { background: var(--711-orange); color: #fff; box-shadow: 0 4px 12px rgba(255, 102, 0, 0.25); transition: background 0.3s; }
         
         /* モーダル */
-        #master-modal, #copy-modal, #image-modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(241, 245, 249, 0.98); z-index: 2000; padding: 20px; overflow-y: auto;
-        }
-        textarea {
-            width: 100%; height: 42vh; margin: 10px 0; padding: 14px;
-            border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px;
-            background: #fff; line-height: 1.5; font-family: monospace;
-        }
+        #master-modal, #copy-modal, #image-modal { display: none; position: fixed; inset: 0; background: rgba(242, 244, 247, 0.98); z-index: 2000; padding: 20px; overflow-y: auto; }
+        textarea { width: 100%; height: 40vh; margin: 10px 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #fff; }
+
+        /* スマホ画面用の注釈ラベル */
+        .legend-note { font-size: 11px; font-weight: bold; color: var(--text-sub); text-align: right; margin: -6px 4px 10px 0; letter-spacing: 0.5px; }
+        .legend-pill { background: #fff; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border-color); display: inline-block; }
 
         /* =========================================
            印刷・画像エクスポート 共通レイアウト
@@ -518,42 +251,42 @@
             }
         }
 
-        /* 印刷時＆画像化時 共通の表デザイン（プロ仕様） */
-        #print-container { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 4.5mm 6mm; box-sizing: border-box; background: white; }
-        .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2.5px solid #0f172a; margin-bottom: 2.5mm; padding-bottom: 1.5mm; flex-shrink: 0; }
+        /* 印刷時＆画像化時 共通の表デザイン */
+        #print-container { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 4mm 6mm; box-sizing: border-box; background: white; }
+        .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; margin-bottom: 2mm; padding-bottom: 1mm; flex-shrink: 0; }
         .print-header-left { display: flex; flex-direction: column; gap: 2px; }
-        .print-title { font-size: 19px; font-weight: 900; letter-spacing: 0.5px; color: #0f172a; display: flex; align-items: baseline; gap: 6px; }
-        .print-title-sub { font-size: 11px; color: #475569; font-weight: 800; }
-        .print-warning { font-size: 10.5px; color: #334155; font-weight: 800; }
-        .print-date { font-size: 9.5px; color: #64748b; font-weight: 600; }
-        .print-daily-total { display: flex; flex-direction: column; gap: 2px; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 4px 8px; border-radius: 6px; text-align: right; }
-        .print-daily-total div { font-size: 11px; font-weight: 800; }
-        .print-daily-total span { font-size: 14px; color: #0f172a; margin-left: 4px; font-weight: 900; }
+        .print-title { font-size: 18px; font-weight: 900; letter-spacing: 0; color: #000; display: flex; align-items: baseline; gap: 6px; }
+        .print-title-sub { font-size: 11px; color: #555; font-weight: 700; }
+        .print-warning { font-size: 11px; color: #555; font-weight: bold; }
+        .print-date { font-size: 10px; color: #555; }
+        .print-daily-total { display: flex; flex-direction: column; gap: 1px; background: #f9f9f9; border: 1px solid #ccc; padding: 3px 6px; border-radius: 4px; text-align: right; }
+        .print-daily-total div { font-size: 11px; font-weight: bold; }
+        .print-daily-total span { font-size: 14px; color: #000; margin-left: 3px; }
         
         .print-grid { display: flex; flex-direction: column; gap: 2.5mm; flex: 1; min-height: 0; overflow: hidden; }
         .print-row { display: flex; flex-direction: row; gap: 2.5mm; flex: 1; min-height: 0; }
-        .print-block { flex: 1; border: 2px solid #0f172a; display: flex; flex-direction: column; background: #fff; border-radius: 6px; overflow: hidden; page-break-inside: avoid; }
-        .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 8px; color: #fff; font-weight: 900; font-size: 12px; border-bottom: 2px solid #0f172a; height: 20px; flex-shrink: 0; letter-spacing: 0.5px; }
+        .print-block { flex: 1; border: 2px solid #000; display: flex; flex-direction: column; background: #fff; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
+        .print-block-title { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; color: #fff; font-weight: bold; font-size: 12px; border-bottom: 2px solid #000; height: 18px; flex-shrink: 0;}
         .print-block-title.weekday { background-color: var(--print-blue); }
         .print-block-title.holiday { background-color: var(--print-red); }
-        .print-block-total { font-size: 10.5px; font-weight: 800; background: rgba(255,255,255,0.22); padding: 1px 6px; border-radius: 4px; }
+        .print-block-total { font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.25); padding: 1px 4px; border-radius: 6px; }
         .print-units-container { display: flex; flex-direction: row; flex: 1; min-height: 0; }
-        .print-unit-col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #0f172a; }
+        .print-unit-col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #000; }
         .print-unit-col:last-child { border-right: none; }
-        .print-unit-header { font-size: 10px; text-align: center; font-weight: 900; background: #f1f5f9; border-bottom: 1.5px solid #0f172a; padding: 2px 0; display: none; flex-shrink: 0; color: #0f172a; }
+        .print-unit-header { font-size: 10px; text-align: center; font-weight: 800; background: #eee; border-bottom: 1px solid #000; padding: 2px 0; display: none; flex-shrink: 0;}
         .two-units .print-unit-header { display: block; }
         
-        .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #64748b; overflow: hidden; min-height: 0; position: relative; }
+        .print-shelf { display: flex; flex: 1; border-bottom: 1px solid #666; overflow: hidden; min-height: 0; position: relative; }
         .print-block > .print-shelf:last-child, .print-unit-col > .print-shelf:last-child { border-bottom: none; }
-        .print-shelf-label { width: 17px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #64748b; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #1e293b; }
+        .print-shelf-label { width: 16px; background: #eaeaea; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; border-right: 1px solid #666; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; padding: 1px 0; color: #333; }
         .print-slots { display: flex; flex: 1; min-height: 0; }
-        .print-slot { border-right: 1px dashed #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
+        .print-slot { border-right: 1px dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; text-align: center; overflow: hidden; min-height: 0; flex: 1; }
         .print-slot:last-child { border-right: none; }
-        .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #0f172a; }
+        .print-name { font-size: 11px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; justify-content: center; flex: 1; word-break: break-all; width: 100%; padding: 1px; color: #111; }
         .print-qty { font-size: 19px; font-weight: 900; line-height: 1.0; color: #000; margin-top: 1px; }
         .mode-bakery .print-qty { font-size: 21px; } 
-        .print-qty.zero { color: #cbd5e1; font-size: 12px; font-weight: normal; }
-        .print-shelf.hidden-shelf { background-color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .print-qty.zero { color: #ccc; font-size: 12px; font-weight: normal; }
+        .print-shelf.hidden-shelf { background-color: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .print-shelf.hidden-shelf * { visibility: hidden !important; }
     </style>
 </head>
@@ -566,14 +299,11 @@
             <span class="app-title-badge" id="header-badge">FRYER</span>
         </div>
         <div class="app-title-sub-row">
-            <span class="app-title-sub" id="app-subtitle">フライヤー仕込み表</span>
-            <span class="save-status" id="save-indicator">● 保存済</span>
+            <span class="app-title-sub" id="app-subtitle">カンタン仕込み表作成ツール</span>
+            <span class="save-status" id="save-indicator">✓ 自動保存</span>
         </div>
     </div>
-    <div class="total-box">
-        <span class="total-label">シフト売価合計</span>
-        <div class="total-display" id="grand-total">¥0</div>
-    </div>
+    <div class="total-display" id="grand-total">売価合計: ¥0</div>
 </div>
 
 <!-- メインタブ -->
@@ -624,47 +354,47 @@
         <button class="btn" id="btn-holiday" onclick="setGlobalDay('holiday')">土日祝</button>
     </div>
     <div class="btn-group">
-        <button class="btn" id="btn-morning" onclick="setGlobalTime('morning')">🌅 朝</button>
-        <button class="btn" id="btn-noon" onclick="setGlobalTime('noon')">☀️ 昼</button>
-        <button class="btn" id="btn-night" onclick="setGlobalTime('night')">🌙 夜</button>
+        <button class="btn" id="btn-morning" onclick="setGlobalTime('morning')">朝</button>
+        <button class="btn" id="btn-noon" onclick="setGlobalTime('noon')">昼</button>
+        <button class="btn" id="btn-night" onclick="setGlobalTime('night')">夜</button>
     </div>
     <div class="action-btns">
-        <button class="btn-sub" onclick="openMaster()"><span class="btn-icon">⚙️</span>商品編集</button>
-        <button class="btn-sub copy" onclick="openCopyModal()"><span class="btn-icon">🔄</span>コピー</button>
-        <button class="btn-sub img-save" id="btn-image-save" onclick="executeImageSave()"><span class="btn-icon">📸</span>画像保存</button>
-        <button class="btn-main" id="btn-print" onclick="executePrint()"><span class="btn-icon">🖨️</span>印刷</button>
+        <button class="btn-sub" onclick="openMaster()">商品編集</button>
+        <button class="btn-sub copy" onclick="openCopyModal()">🔄 コピー</button>
+        <button class="btn-sub" id="btn-image-save" style="background: #34c759; color: white;" onclick="executeImageSave()">📸 画像保存</button>
+        <button class="btn-main" id="btn-print" onclick="executePrint()">🖨️ 印刷</button>
     </div>
 </div>
 
 <!-- モーダル群 -->
 <div id="master-modal">
-    <h3 style="margin-top:0; color:#0f172a;" id="master-modal-title">商品マスター更新</h3>
+    <h3 style="margin-top:0;" id="master-modal-title">商品マスター更新</h3>
     <textarea id="master-input"></textarea>
-    <div style="margin-bottom: 12px;">
-        <button class="btn-sub" style="background:#dc2626; width:100%; padding:14px; font-size:14px; flex-direction:row;" onclick="resetMaster()">初期状態に戻す</button>
+    <div class="action-btns" style="margin-bottom: 12px; display: flex;">
+        <button class="btn-sub" style="background:#ee0000; width:100%;" onclick="resetMaster()">初期状態に戻す</button>
     </div>
-    <div style="display: flex; gap: 8px;">
-        <button class="btn-sub" style="flex: 1; padding:14px; font-size:14px; flex-direction:row;" onclick="closeMaster()">戻る</button>
-        <button class="btn-main" style="flex: 1; padding:14px; font-size:14px; flex-direction:row;" onclick="saveMaster()">保存して反映</button>
+    <div class="action-btns" style="display: flex; gap: 8px;">
+        <button class="btn-sub" style="flex: 1;" onclick="closeMaster()">戻る</button>
+        <button class="btn-main" style="flex: 1;" onclick="saveMaster()">保存して反映</button>
     </div>
 </div>
 
 <div id="copy-modal">
-    <h3 style="margin-top:0; color:#0f172a;">パターンのコピー</h3>
-    <div style="background:#fff; padding:16px; border-radius:14px; margin-bottom:20px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-        <p style="margin:0; font-size:14px; color:var(--text-main); line-height:1.6;" id="copy-message"></p>
+    <h3 style="margin-top:0;">パターンのコピー</h3>
+    <div style="background:#fff; padding:16px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <p style="margin:0; font-size:14px; color:var(--text-main); line-height:1.5;" id="copy-message"></p>
     </div>
-    <div id="copy-btn-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom: 24px;"></div>
-    <button class="btn-sub" style="width:100%; padding: 14px; font-size:14px; flex-direction:row;" onclick="closeCopyModal()">キャンセル</button>
+    <div id="copy-btn-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 24px;"></div>
+    <button class="btn-sub" style="width:100%; padding: 14px;" onclick="closeCopyModal()">キャンセル</button>
 </div>
 
 <div id="image-modal">
-    <h3 style="margin-top:0; color:#0f172a;">ネットプリント用画像</h3>
-    <p style="font-size: 13px; color: #b91c1c; font-weight: 800; background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 10px; margin-bottom: 16px;">
-        ↓ 下の画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存」をタップしてください。
+    <h3 style="margin-top:0;">ネットプリント用画像</h3>
+    <p style="font-size: 13px; color: var(--711-red); font-weight: bold; background: #ffeeee; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
+        ↓ この画像を<strong>長押し</strong>して、「写真に追加」または「画像を保存」をタップしてください。
     </p>
-    <div id="image-result-container" style="text-align:center; overflow-y:auto; max-height:55vh; border:2px solid #cbd5e1; border-radius: 12px; background:#fff; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></div>
-    <button class="btn-sub" style="width:100%; margin-top: 16px; padding: 14px; font-size:14px; flex-direction:row;" onclick="closeImageModal()">閉じる</button>
+    <div id="image-result-container" style="text-align:center; overflow-y:auto; max-height:55vh; border:2px solid var(--border-color); border-radius: 8px; background:#fff; padding: 4px;"></div>
+    <button class="btn-sub" style="width:100%; margin-top: 16px; padding: 14px;" onclick="closeImageModal()">閉じる</button>
 </div>
 
 <script>
@@ -676,12 +406,7 @@
     currentTab = appPrefs.tab; globalDay = appPrefs.day; globalTime = appPrefs.time; globalWeather = appPrefs.weather || 'normal';
 
     function savePrefs() { appPrefs = { tab: currentTab, day: globalDay, time: globalTime, weather: globalWeather }; localStorage.setItem('sej_app_prefs_v2', JSON.stringify(appPrefs)); flashSaveIndicator(); }
-    function flashSaveIndicator() { 
-        const ind = document.getElementById('save-indicator'); 
-        ind.textContent = '● 保存完了';
-        ind.style.opacity = '1'; 
-        setTimeout(() => { ind.style.opacity = '0.65'; ind.textContent = '● 自動保存'; }, 1000); 
-    }
+    function flashSaveIndicator() { const ind = document.getElementById('save-indicator'); ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0.5'; }, 800); }
 
     /* =========================================================
        フライヤー用データ＆ロジック
@@ -717,16 +442,16 @@
         for (let i = 0; i < 4; i++) {
             const data = slots[i]; if (!data) continue; const isExp = data.span === 2;
             const hasQty = (data.qty > 0 && data.name !== "未設定");
-            const slotEl = document.createElement('div'); 
+            const slotEl = document.createElement('div');
+            slotEl.id = `f-slot-${sNum}-${i}`;
             slotEl.className = `slot ${isExp ? 'expanded' : ''} ${hasQty ? 'has-qty' : ''}`;
-            
             const opts = f_productMaster.map(p => `<option value="${p.name}" ${p.name===data.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts = ''; for(let q=0; q<=20; q++) qtyOpts += `<option value="${q}" ${data.qty===q?'selected':''}>${q}</option>`;
-            let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">>< 1F</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">◀▶ 2F</button>` : '');
+            let btn = isExp ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">>< 1F戻す</button>` : (i<3 && slots[i+1] ? `<button class="expand-btn" onclick="f_toggleSpan(${sNum}, ${i})">◀▶ 2F展開</button>` : '');
             
             slotEl.innerHTML = `
                 <div class="slot-header"><span>${isExp ? '2F展開' : '1F'}</span>${btn}</div>
-                <select class="prod-select" onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select>
+                <select onchange="f_update(${sNum}, ${i}, 'name', this.value)">${opts}</select>
                 <div class="qty-row">
                     <select class="qty-select" onchange="f_update(${sNum}, ${i}, 'qty', this.value)">${qtyOpts}</select>
                     <span class="qty-unit">個</span>
@@ -738,12 +463,14 @@
             body.appendChild(slotEl); if(isExp) i++;
         }
     }
-    function f_update(s, i, f, v) { 
-        if(f==='qty') v=parseInt(v)||0; 
-        f_appData[`${globalDay}_${globalTime}_${globalWeather}`][s][i][f]=v; 
-        localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData)); 
-        if(f==='qty' || f==='name') f_renderShelf(s); // ハイライト即時反映のため再描画
-        updateGrandTotal(); flashSaveIndicator(); 
+    function f_update(s, i, f, v) {
+        if(f==='qty') v=parseInt(v)||0;
+        const d = f_appData[`${globalDay}_${globalTime}_${globalWeather}`][s][i];
+        d[f]=v;
+        localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData));
+        const slotEl = document.getElementById(`f-slot-${s}-${i}`);
+        if (slotEl) slotEl.classList.toggle('has-qty', d.qty > 0 && d.name !== "未設定");
+        updateGrandTotal(); flashSaveIndicator();
     }
     function f_toggleSpan(s, i) { const slots = f_appData[`${globalDay}_${globalTime}_${globalWeather}`][s]; if(slots[i].span===1){ slots[i].span=2; if(i+1<4) slots[i+1].span=1; } else { slots[i].span=1; } localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData)); f_renderShelf(s); updateGrandTotal(); }
     function f_toggleShelf(n) { const chk=document.getElementById(`f-check-${n}`).checked; document.getElementById(`f-shelf-${n}`).classList.toggle('hidden', chk); f_sysState.hidden[`${globalDay}_${globalTime}_${globalWeather}`][n]=chk; localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState)); }
@@ -785,18 +512,18 @@
     function b_renderShelf(u, s) {
         const body=document.getElementById(`b-shelf-body-${u}-${s}`); if(!body) return; body.innerHTML=''; const slots=b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s];
         for(let i=0; i<2; i++){
-            const d=slots[i]; if(!d) continue; const isExp=d.span===2; 
+            const d=slots[i]; if(!d) continue; const isExp=d.span===2;
             const hasQty = (d.qty > 0 && d.name !== "未設定");
-            const slotEl=document.createElement('div'); 
+            const slotEl=document.createElement('div');
+            slotEl.id = `b-slot-${u}-${s}-${i}`;
             slotEl.className=`slot ${isExp?'expanded':''} ${hasQty ? 'has-qty' : ''}`;
-            
             const opts=b_productMaster.map(p=>`<option value="${p.name}" ${p.name===d.name?'selected':''}>${p.name==="未設定"?"未設定":`${p.name}(¥${Math.floor(p.price)})`}</option>`).join('');
             let qtyOpts=''; for(let q=0; q<=20; q++) qtyOpts+=`<option value="${q}" ${d.qty===q?'selected':''}>${q}</option>`;
             let btn = isExp ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">>< 1F戻す</button>` : (i===0 ? `<button class="expand-btn" onclick="b_toggleSpan(${u},${s},${i})">◀▶ 2F展開</button>` : '');
             
             slotEl.innerHTML=`
                 <div class="slot-header"><span>${isExp?'2フェイス展開':(i===0?'左フェイス':'右フェイス')}</span>${btn}</div>
-                <select class="prod-select" onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select>
+                <select onchange="b_update(${u},${s},${i},'name',this.value)">${opts}</select>
                 <div class="qty-row">
                     <select class="qty-select" onchange="b_update(${u},${s},${i},'qty',this.value)">${qtyOpts}</select>
                     <span class="qty-unit">個</span>
@@ -808,12 +535,14 @@
             body.appendChild(slotEl); if(isExp) i++;
         }
     }
-    function b_update(u, s, i, f, v) { 
-        if(f==='qty') v=parseInt(v)||0; 
-        b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s][i][f]=v; 
-        localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData)); 
-        if(f==='qty' || f==='name') b_renderShelf(u, s); // ハイライト即時反映
-        updateGrandTotal(); flashSaveIndicator(); 
+    function b_update(u, s, i, f, v) {
+        if(f==='qty') v=parseInt(v)||0;
+        const d = b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s][i];
+        d[f]=v;
+        localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData));
+        const slotEl = document.getElementById(`b-slot-${u}-${s}-${i}`);
+        if (slotEl) slotEl.classList.toggle('has-qty', d.qty > 0 && d.name !== "未設定");
+        updateGrandTotal(); flashSaveIndicator();
     }
     function b_toggleSpan(u, s, i) { const slots=b_appData[`${globalDay}_${globalTime}_${globalWeather}`][u][s]; if(!slots[i].span||slots[i].span===1){ slots[i].span=2; if(i+1<2) slots[i+1].span=1; } else { slots[i].span=1; } localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData)); b_renderShelf(u, s); updateGrandTotal(); flashSaveIndicator(); }
     function b_toggleShelf(u, s) { const chk=document.getElementById(`b-check-${u}-${s}`).checked; document.getElementById(`b-shelf-${u}-${s}`).classList.toggle('hidden', chk); b_sysState.hidden[`${globalDay}_${globalTime}_${globalWeather}`][u][s]=chk; localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState)); }
@@ -827,11 +556,9 @@
     function switchTab(tab) {
         currentTab = tab; savePrefs();
         document.body.classList.toggle('theme-bakery', tab==='bakery');
-        document.getElementById('tab-fryer').classList.toggle('active', tab==='fryer'); 
-        document.getElementById('tab-bakery').classList.toggle('active', tab==='bakery');
-        document.getElementById('view-fryer').style.display = tab==='fryer' ? 'block' : 'none'; 
-        document.getElementById('view-bakery').style.display = tab==='bakery' ? 'block' : 'none';
-        
+        document.getElementById('tab-fryer').classList.toggle('active', tab==='fryer'); document.getElementById('tab-bakery').classList.toggle('active', tab==='bakery');
+        document.getElementById('view-fryer').style.display = tab==='fryer' ? 'block' : 'none'; document.getElementById('view-bakery').style.display = tab==='bakery' ? 'block' : 'none';
+        document.getElementById('btn-print').style.background = tab==='fryer' ? 'var(--711-orange)' : 'var(--bakery-orange)';
         document.getElementById('header-badge').textContent = tab==='fryer' ? 'FRYER' : 'BAKERY';
         document.getElementById('app-subtitle').textContent = tab==='fryer' ? 'フライヤー仕込み表' : '常温什器（焼成パン）仕込み表';
         updateGrandTotal();
@@ -839,14 +566,14 @@
     function setGlobalWeather(weather) { globalWeather=weather; savePrefs(); document.getElementById('btn-normal').classList.toggle('active', weather==='normal'); document.getElementById('btn-rainy').classList.toggle('active', weather==='rainy'); f_updateHideUI(); b_updateHideUI(); f_renderAll(); b_renderAll(); updateGrandTotal(); }
     function setGlobalDay(day) { globalDay=day; savePrefs(); document.getElementById('btn-weekday').classList.toggle('active', day==='weekday'); document.getElementById('btn-holiday').classList.toggle('active', day==='holiday'); f_updateHideUI(); b_updateHideUI(); f_renderAll(); b_renderAll(); updateGrandTotal(); }
     function setGlobalTime(time) { globalTime=time; savePrefs(); ['morning','noon','night'].forEach(t=>document.getElementById(`btn-${t}`).classList.toggle('active', time===t)); f_updateHideUI(); b_updateHideUI(); f_renderAll(); b_renderAll(); updateGrandTotal(); }
-    function updateGrandTotal() { const sum = currentTab === 'fryer' ? f_calcSum() : b_calcSum(); document.getElementById('grand-total').textContent = `¥${sum.toLocaleString()}`; }
+    function updateGrandTotal() { const sum = currentTab === 'fryer' ? f_calcSum() : b_calcSum(); document.getElementById('grand-total').textContent = `売価合計: ¥${sum.toLocaleString()}`; }
 
     function openMaster() { document.getElementById('master-modal-title').textContent = currentTab === 'fryer' ? 'フライヤー商品更新' : 'パン商品更新'; document.getElementById('master-input').value = (currentTab === 'fryer' ? f_productMaster : b_productMaster).map(p => `${p.name}\n${p.price}`).join('\n'); document.getElementById('master-modal').style.display='block'; }
     function closeMaster() { document.getElementById('master-modal').style.display='none'; }
     function saveMaster() { const lines = document.getElementById('master-input').value.split('\n'); const newList = [{ name: "未設定", price: 0 }]; for(let i=0; i<lines.length; i+=2) { const n=lines[i]?lines[i].trim():''; const p=lines[i+1]?lines[i+1].match(/[\d.]+/):null; if(n&&n!=="未設定") newList.push({name:n, price:p?parseFloat(p[0]):0}); } if(currentTab==='fryer') { f_productMaster = newList; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster = newList; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); updateGrandTotal(); flashSaveIndicator(); }
     function resetMaster() { if(confirm("初期状態に戻しますか？\n（※現在入力されている仕込みの数やレイアウトは消えません）")) { if(currentTab==='fryer') { f_productMaster=[...f_defaultMaster]; localStorage.setItem('sej_flyer_master_v5', JSON.stringify(f_productMaster)); f_renderAll(); } else { b_productMaster=[...b_defaultMaster]; localStorage.setItem('sej_bakery_master_v1', JSON.stringify(b_productMaster)); b_renderAll(); } closeMaster(); flashSaveIndicator(); updateGrandTotal(); } }
 
-    function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; const wLbl=globalWeather==='normal'?'通常':'雨天'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${wLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在選択中の天気パターン内でのみコピーされます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.fontSize='14px'; b.style.flexDirection='row'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
+    function openCopyModal() { const tLbl={'morning':'朝','noon':'昼','night':'夜'}; const dLbl=globalDay==='weekday'?'平日':'土日祝'; const wLbl=globalWeather==='normal'?'通常':'雨天'; document.getElementById('copy-message').innerHTML = `<strong>【${dLbl} - ${wLbl} - ${tLbl[globalTime]}】</strong>にコピーします。<br>※現在選択中の天気パターン内でのみコピーされます。`; const c=document.getElementById('copy-btn-container'); c.innerHTML=''; ['morning','noon','night'].forEach(t=>{ if(t!==globalTime){ const b=document.createElement('button'); b.className='btn-main'; b.style.background='var(--711-green)'; b.style.padding='14px'; b.style.width='100%'; b.innerHTML=`📋 【${tLbl[t]}】からコピー`; b.onclick=()=>executeCopy(t); c.appendChild(b); } }); document.getElementById('copy-modal').style.display='block'; }
     function closeCopyModal() { document.getElementById('copy-modal').style.display='none'; }
     function executeCopy(srcTime) { if(!confirm('上書きされます。よろしいですか？')) return; const tk=`${globalDay}_${globalTime}_${globalWeather}`; const sk=`${globalDay}_${srcTime}_${globalWeather}`; if(currentTab==='fryer') { f_appData[tk]=JSON.parse(JSON.stringify(f_appData[sk])); f_sysState.hidden[tk]=JSON.parse(JSON.stringify(f_sysState.hidden[sk])); localStorage.setItem('sej_flyer_data_v6', JSON.stringify(f_appData)); localStorage.setItem('sej_flyer_sys_v6', JSON.stringify(f_sysState)); f_updateHideUI(); f_renderAll(); } else { b_appData[tk]=JSON.parse(JSON.stringify(b_appData[sk])); b_sysState.hidden[tk]=JSON.parse(JSON.stringify(b_sysState.hidden[sk])); localStorage.setItem('sej_bakery_data_v2', JSON.stringify(b_appData)); localStorage.setItem('sej_bakery_sys_v2', JSON.stringify(b_sysState)); b_updateHideUI(); b_renderAll(); } closeCopyModal(); updateGrandTotal(); flashSaveIndicator(); }
 
@@ -892,7 +619,7 @@
                         const nm=(dt.name==="未設定"||q===0)?"":dt.name; 
                         const widthRatio = (dt.span === 2) ? 0.5 : 0.25;
                         const fSize = getOptimalFontSize(nm, dt.wave, widthRatio);
-                        const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:#c2410c; white-space:nowrap;'>（波型）</span>` : "";
+                        const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>` : "";
                         html+=`<div class="print-slot" style="flex:${dt.span===2?2:1};"><div class="print-name" style="font-size:${fSize}; line-height:1.15;">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
                         if(dt.span===2) i++; 
                     }
@@ -919,7 +646,7 @@
                             const unitWidth = (uCnt === 2) ? 0.5 : 1.0;
                             const widthRatio = (isExp ? 1.0 : 0.5) * unitWidth;
                             const fSize = getOptimalFontSize(nm, dt.wave, widthRatio);
-                            const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:#c2410c; white-space:nowrap;'>（波型）</span>` : "";
+                            const waveMark = (dt.wave && nm) ? ` <span style='font-size:0.9em; font-weight:800; color:var(--bakery-orange); white-space:nowrap;'>（波型）</span>` : "";
                             html+=`<div class="print-slot" style="flex:${isExp?2:1};"><div class="print-name" style="font-size:${fSize}; line-height:1.15;">${nm}${waveMark}</div><div class="print-qty ${q>0?'':'zero'}">${q>0?q:'-'}</div></div>`; 
                             if(isExp) i++; 
                         }
@@ -933,16 +660,16 @@
 
     function executePrint() { buildPrintHTML(); setTimeout(() => { window.print(); }, 200); }
     function executeImageSave() {
-        const btn = document.getElementById('btn-image-save'); const originalHTML = btn.innerHTML; btn.innerHTML = '<span class="btn-icon">⏳</span>生成中...';
+        const btn = document.getElementById('btn-image-save'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ 処理中...';
         buildPrintHTML(); document.body.classList.add('export-mode');
         setTimeout(() => {
             const wrapper = document.getElementById('print-wrapper');
             html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-                document.body.classList.remove('export-mode'); btn.innerHTML = originalHTML;
+                document.body.classList.remove('export-mode'); btn.innerHTML = originalText;
                 const img = document.createElement('img'); img.src = canvas.toDataURL('image/png'); img.style.width = '100%'; img.style.height = 'auto';
                 const resultContainer = document.getElementById('image-result-container'); resultContainer.innerHTML = ''; resultContainer.appendChild(img);
                 document.getElementById('image-modal').style.display = 'block';
-            }).catch(err => { document.body.classList.remove('export-mode'); btn.innerHTML = originalHTML; alert('画像の生成に失敗しました。'); });
+            }).catch(err => { document.body.classList.remove('export-mode'); btn.innerHTML = originalText; alert('画像の生成に失敗しました。'); });
         }, 500); 
     }
 
